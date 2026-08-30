@@ -12,13 +12,20 @@
   <!-- Header -->
   <header class="p-5 bg-slate-800 shadow-md border-b border-slate-700 flex justify-between items-center">
     <h1 class="text-2xl font-bold text-emerald-400">ProfitInvest PKR</h1>
-    <a href="#packages" class="bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-lg text-sm font-medium transition">View Plans</a>
+    <div id="auth-buttons" class="space-x-2">
+      <button onclick="openModal('login')" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg text-sm font-medium transition">Login</button>
+      <button onclick="openModal('register')" class="bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-lg text-sm font-medium transition">Register</button>
+    </div>
+    <div id="user-info" class="hidden flex items-center space-x-4">
+      <span id="user-email" class="text-emerald-400 text-sm font-semibold"></span>
+      <button onclick="logout()" class="bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-lg text-xs font-medium transition">Logout</button>
+    </div>
   </header>
 
   <!-- Hero Section -->
   <section class="text-center py-16 px-4">
     <h2 class="text-4xl font-extrabold mb-4">Secure & High Yield Investment Plans</h2>
-    <p class="text-slate-400 max-w-xl mx-auto mb-8">Select your package in PKR, start earning daily returns guaranteed for 60 days.</p>
+    <p class="text-slate-400 max-w-xl mx-auto mb-8">Create an account, select your package in PKR, and start earning daily returns guaranteed for 60 days.</p>
   </section>
 
   <!-- Packages Grid -->
@@ -97,24 +104,125 @@
 
   </section>
 
+  <!-- Auth Modal (Popup Window for Login/Register) -->
+  <div id="auth-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl w-full max-w-md relative">
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">✕</button>
+      <h3 id="modal-title" class="text-2xl font-bold text-emerald-400 mb-4">Login</h3>
+      
+      <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1 text-slate-300">Email Address</label>
+          <input type="email" id="auth-email" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1 text-slate-300">Password</label>
+          <input type="password" id="auth-password" required minlength="6" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
+        </div>
+        <button type="submit" id="auth-submit-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Submit</button>
+      </form>
+
+      <p class="text-sm text-slate-400 mt-4 text-center">
+        <span id="modal-toggle-text">Don't have an account?</span> 
+        <button onclick="toggleAuthMode()" id="modal-toggle-btn" class="text-emerald-400 underline font-semibold">Register here</button>
+      </p>
+    </div>
+  </div>
+
   <script>
-    // Replace with your Supabase Project details
+    // Supabase Configuration
     const SUPABASE_URL = 'https://rrinvfjkvepclqesxaox.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyaW52ZmprdmVwY2xxZXN4YW94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNjg5MTMsImV4cCI6MjEwMzY0NDkxM30.5DRZBsF_k21AJE0SXf_p_gSSsR30FW0H-qm2aWQ4pb8';
+    const SUPABASE_KEY = 'sb_secret_2TD9Pav_gFVgTf2VuT-Duw_MNvFu1YO';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    let currentMode = 'login';
+    let currentUser = null;
+
+    // Check user session on page load
+    async function checkUser() {
+      const { data: { user } } = await _supabase.auth.getUser();
+      if (user) {
+        currentUser = user;
+        document.getElementById('auth-buttons').classList.add('hidden');
+        document.getElementById('user-info').classList.remove('hidden');
+        document.getElementById('user-email').innerText = user.email;
+      } else {
+        currentUser = null;
+        document.getElementById('auth-buttons').classList.remove('hidden');
+        document.getElementById('user-info').classList.add('hidden');
+      }
+    }
+    checkUser();
+
+    function openModal(mode) {
+      currentMode = mode;
+      updateModalUI();
+      document.getElementById('auth-modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('auth-modal').classList.add('hidden');
+    }
+
+    function toggleAuthMode() {
+      currentMode = currentMode === 'login' ? 'register' : 'login';
+      updateModalUI();
+    }
+
+    function updateModalUI() {
+      const isLogin = currentMode === 'login';
+      document.getElementById('modal-title').innerText = isLogin ? 'Login to Account' : 'Create New Account';
+      document.getElementById('auth-submit-btn').innerText = isLogin ? 'Login' : 'Register Account';
+      document.getElementById('modal-toggle-text').innerText = isLogin ? "Don't have an account?" : "Already have an account?";
+      document.getElementById('modal-toggle-btn').innerText = isLogin ? 'Register here' : 'Login here';
+    }
+
+    async function handleAuth(e) {
+      e.preventDefault();
+      const email = document.getElementById('auth-email').value;
+      const password = document.getElementById('auth-password').value;
+
+      if (currentMode === 'register') {
+        const { data, error } = await _supabase.auth.signUp({ email, password });
+        if (error) {
+          alert("Registration Error: " + error.message);
+        } else {
+          alert("Account created successfully! You are now logged in.");
+          closeModal();
+          checkUser();
+        }
+      } else {
+        const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+          alert("Login Error: " + error.message);
+        } else {
+          alert("Logged in successfully!");
+          closeModal();
+          checkUser();
+        }
+      }
+    }
+
+    async function logout() {
+      await _supabase.auth.signOut();
+      checkUser();
+    }
+
     async function subscribePackage(pkgName, amount) {
-      const userName = prompt(`Enter your Name/Phone number for ${pkgName} (Deposit: PKR ${amount}):`);
-      if (!userName) return;
+      if (!currentUser) {
+        alert("Please Login or Register an account first to invest!");
+        openModal('login');
+        return;
+      }
 
       const { data, error } = await _supabase
         .from('user_investments')
-        .insert([{ user_name: userName, package_name: pkgName, amount_pkr: amount, status: 'Pending' }]);
+        .insert([{ user_name: currentUser.email, package_name: pkgName, amount_pkr: amount, status: 'Pending' }]);
 
       if (error) {
         alert("Error submitting request: " + error.message);
       } else {
-        alert(`Success! Request for ${pkgName} (PKR ${amount}) submitted. Admin will verify shortly.`);
+        alert(`Success! Request for ${pkgName} (PKR ${amount}) submitted under account: ${currentUser.email}`);
       }
     }
   </script>
