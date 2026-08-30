@@ -22,8 +22,37 @@
     </div>
   </header>
 
+  <!-- User Active Investments & History Section -->
+  <section id="user-dashboard" class="hidden max-w-6xl mx-auto px-4 pt-8">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8">
+      <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
+        <h3 class="text-xl font-bold text-emerald-400">My Investment History</h3>
+        <button onclick="loadUserInvestments()" class="text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded text-slate-300">🔄 Refresh History</button>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-900 text-slate-400 uppercase text-xs">
+            <tr>
+              <th class="p-3">Package</th>
+              <th class="p-3">Amount</th>
+              <th class="p-3">Trx ID</th>
+              <th class="p-3">Date</th>
+              <th class="p-3">Status</th>
+            </tr>
+          </thead>
+          <tbody id="user-investments-list">
+            <tr>
+              <td colspan="5" class="p-4 text-center text-slate-500">Loading investments...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
   <!-- Hero Section -->
-  <section class="text-center py-16 px-4">
+  <section class="text-center py-12 px-4">
     <h2 class="text-4xl font-extrabold mb-4">Secure & High Yield Investment Plans</h2>
     <p class="text-slate-400 max-w-xl mx-auto mb-8">Create an account, select your package in PKR, and start earning daily returns guaranteed for 60 days.</p>
   </section>
@@ -115,16 +144,14 @@
       <!-- Bank/Wallet Details Box -->
       <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 mb-4 text-left">
         <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Payment Method</p>
-        <p class="text-sm font-bold text-white mb-2">Easypaisa</p>
+        <p class="text-sm font-bold text-white mb-2">Easypaisa / JazzCash</p>
         
         <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Account Title</p>
-        <!-- CHANGE YOUR ACCOUNT NAME HERE -->
-        <p class="text-sm font-bold text-white mb-3">Ali Akbar</p>
+        <p class="text-sm font-bold text-white mb-3">Ufone Franchise / Ali Raza</p>
         
         <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Account Number</p>
         <div class="flex items-center justify-between bg-slate-800 border border-slate-700 rounded-lg p-2">
-          <!-- CHANGE YOUR ACCOUNT NUMBER HERE -->
-          <span id="accNumber" class="font-mono text-emerald-400 font-bold text-base">03003152236</span>
+          <span id="accNumber" class="font-mono text-emerald-400 font-bold text-base">03331234567</span>
           <button onclick="copyAccountNo()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition">Copy</button>
         </div>
       </div>
@@ -170,7 +197,6 @@
   </div>
 
   <script>
-    // Supabase Configuration
     const SUPABASE_URL = 'https://rrinvfjkvepclqesxaox.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyaW52ZmprdmVwY2xxZXN4YW94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNjg5MTMsImV4cCI6MjEwMzY0NDkxM30.5DRZBsF_k21AJE0SXf_p_gSSsR30FW0H-qm2aWQ4pb8';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -179,7 +205,6 @@
     let currentUser = null;
     let selectedPkg = { name: '', amount: 0 };
 
-    // Check user session on page load
     async function checkUser() {
       const { data: { user } } = await _supabase.auth.getUser();
       if (user) {
@@ -187,13 +212,60 @@
         document.getElementById('auth-buttons').classList.add('hidden');
         document.getElementById('user-info').classList.remove('hidden');
         document.getElementById('user-email').innerText = user.email;
+        document.getElementById('user-dashboard').classList.remove('hidden');
+        loadUserInvestments();
       } else {
         currentUser = null;
         document.getElementById('auth-buttons').classList.remove('hidden');
         document.getElementById('user-info').classList.add('hidden');
+        document.getElementById('user-dashboard').classList.add('hidden');
       }
     }
     checkUser();
+
+    async function loadUserInvestments() {
+      if (!currentUser) return;
+      const listContainer = document.getElementById('user-investments-list');
+      listContainer.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">Loading...</td></tr>';
+
+      const { data, error } = await _supabase
+        .from('user_investments')
+        .select('*')
+        .eq('user_name', currentUser.email)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        listContainer.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-400">Error loading history: ${error.message}</td></tr>`;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        listContainer.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">No investment history found.</td></tr>';
+        return;
+      }
+
+      listContainer.innerHTML = data.map(item => {
+        let statusColor = 'text-amber-400 bg-amber-500/10 border-amber-500/30';
+        if (item.status === 'Approved') statusColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
+        if (item.status === 'Rejected') statusColor = 'text-rose-400 bg-rose-500/10 border-rose-500/30';
+
+        const dateStr = item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A';
+
+        return `
+          <tr class="border-b border-slate-700/50 hover:bg-slate-800/50">
+            <td class="p-3 font-semibold text-emerald-400">${item.package_name || 'N/A'}</td>
+            <td class="p-3 font-bold">PKR ${item.amount_pkr || 0}</td>
+            <td class="p-3 font-mono text-xs text-slate-300">${item.trx_id || 'N/A'}</td>
+            <td class="p-3 text-slate-400 text-xs">${dateStr}</td>
+            <td class="p-3">
+              <span class="px-2.5 py-1 text-xs rounded-full border ${statusColor} font-semibold">
+                ${item.status || 'Pending'}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
 
     function openModal(mode) {
       currentMode = mode;
@@ -249,7 +321,6 @@
       checkUser();
     }
 
-    // Triggered when user clicks "Invest Now"
     function subscribePackage(pkgName, amount) {
       if (!currentUser) {
         alert("Please Login or Register an account first to invest!");
@@ -276,7 +347,6 @@
       });
     }
 
-    // Handles submitting deposit request to Supabase
     async function handleDepositSubmit(e) {
       e.preventDefault();
       const trxId = document.getElementById('trx-id-input').value.trim();
@@ -308,6 +378,7 @@
       } else {
         alert(`Success! Deposit request for ${selectedPkg.name} (PKR ${selectedPkg.amount}) with Trx ID "${trxId}" has been submitted.`);
         closeDepositModal();
+        loadUserInvestments();
       }
     }
   </script>
