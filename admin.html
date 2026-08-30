@@ -7,28 +7,69 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-900 text-white p-8">
+<body class="bg-slate-900 text-white p-4 md:p-8 font-sans">
 
-  <div class="max-w-6xl mx-auto">
-    <h1 class="text-3xl font-bold mb-6 text-emerald-400">Admin Control Panel (PKR Investments)</h1>
+  <div class="max-w-6xl mx-auto space-y-8">
     
-    <div class="bg-slate-800 rounded-lg p-6 border border-slate-700">
-      <h2 class="text-xl font-semibold mb-4">Investment Requests</h2>
-      <table class="w-full text-left border-collapse">
-        <thead>
-          <tr class="border-b border-slate-700 text-slate-400">
-            <th class="p-3">User Name / Phone</th>
-            <th class="p-3">Package</th>
-            <th class="p-3">Amount (PKR)</th>
-            <th class="p-3">Status</th>
-            <th class="p-3">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="request-list">
-          <!-- Dynamic Data from Supabase -->
-        </tbody>
-      </table>
+    <!-- Top Header & Refresh Button -->
+    <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+      <h1 class="text-3xl font-bold text-emerald-400">Admin Control Panel</h1>
+      <button onclick="fetchAllData()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2">
+        🔄 Refresh All Data
+      </button>
     </div>
+
+    <!-- 1. Investment Requests Section -->
+    <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 shadow-lg">
+      <h2 class="text-xl font-bold mb-4 text-emerald-400 flex items-center gap-2">
+        📥 Deposit / Investment Requests
+      </h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="border-b border-slate-700 text-slate-400 uppercase text-xs bg-slate-900/50">
+              <th class="p-3">User Email</th>
+              <th class="p-3">Package</th>
+              <th class="p-3">Amount</th>
+              <th class="p-3">Daily Profit</th>
+              <th class="p-3">Trx ID</th>
+              <th class="p-3">Status</th>
+              <th class="p-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="request-list" class="divide-y divide-slate-700/50">
+            <tr><td colspan="7" class="p-4 text-center text-slate-500">Loading investment requests...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 2. Withdrawal Requests Section -->
+    <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 shadow-lg">
+      <h2 class="text-xl font-bold mb-4 text-emerald-400 flex items-center gap-2">
+        💸 Withdrawal Requests (ويٿڊرا ريڪوئسٽون)
+      </h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="border-b border-slate-700 text-slate-400 uppercase text-xs bg-slate-900/50">
+              <th class="p-3">User Email</th>
+              <th class="p-3">Method</th>
+              <th class="p-3">Account Title</th>
+              <th class="p-3">Account Number</th>
+              <th class="p-3">Amount</th>
+              <th class="p-3">Date</th>
+              <th class="p-3">Status</th>
+              <th class="p-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="withdrawal-list" class="divide-y divide-slate-700/50">
+            <tr><td colspan="8" class="p-4 text-center text-slate-500">Loading withdrawal requests...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -36,43 +77,135 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyaW52ZmprdmVwY2xxZXN4YW94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNjg5MTMsImV4cCI6MjEwMzY0NDkxM30.5DRZBsF_k21AJE0SXf_p_gSSsR30FW0H-qm2aWQ4pb8';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    async function fetchRequests() {
+    // Initial Load
+    function fetchAllData() {
+      fetchInvestmentRequests();
+      fetchWithdrawalRequests();
+    }
+
+    // --- 1. Fetch Investment Requests ---
+    async function fetchInvestmentRequests() {
+      const tableBody = document.getElementById('request-list');
+      
       const { data, error } = await _supabase
         .from('user_investments')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) return console.error(error);
+      if (error) {
+        tableBody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-rose-400">Error: ${error.message}</td></tr>`;
+        return;
+      }
 
-      const tableBody = document.getElementById('request-list');
-      tableBody.innerHTML = '';
+      if (!data || data.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-500">No investment requests found.</td></tr>';
+        return;
+      }
 
-      data.forEach(req => {
-        tableBody.innerHTML += `
-          <tr class="border-b border-slate-700/50">
-            <td class="p-3 font-medium">${req.user_name}</td>
-            <td class="p-3">${req.package_name}</td>
-            <td class="p-3 font-bold text-emerald-400">PKR ${req.amount_pkr || '-'}</td>
+      tableBody.innerHTML = data.map(req => {
+        let statusBadge = 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+        if (req.status === 'Approved') statusBadge = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+        if (req.status === 'Rejected') statusBadge = 'bg-rose-500/20 text-rose-400 border-rose-500/30';
+
+        return `
+          <tr class="hover:bg-slate-800/60">
+            <td class="p-3 font-medium text-slate-200">${req.user_name || 'N/A'}</td>
+            <td class="p-3 text-emerald-400 font-semibold">${req.package_name || 'N/A'}</td>
+            <td class="p-3 font-bold text-white">PKR ${req.amount_pkr || 0}</td>
+            <td class="p-3 text-xs text-slate-300">PKR ${req.daily_profit || 0}/day</td>
+            <td class="p-3 font-mono text-xs text-amber-300">${req.trx_id || 'N/A'}</td>
             <td class="p-3">
-              <span class="px-2.5 py-1 rounded text-xs font-bold ${req.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-400' : req.status === 'Rejected' ? 'bg-rose-500/20 text-rose-400' : 'bg-amber-500/20 text-amber-400'}">
-                ${req.status}
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold border ${statusBadge}">
+                ${req.status || 'Pending'}
               </span>
             </td>
             <td class="p-3 space-x-2">
-              <button onclick="updateStatus('${req.id}', 'Approved')" class="bg-emerald-600 px-3 py-1 rounded text-xs font-semibold hover:bg-emerald-500">Approve</button>
-              <button onclick="updateStatus('${req.id}', 'Rejected')" class="bg-rose-600 px-3 py-1 rounded text-xs font-semibold hover:bg-rose-500">Reject</button>
+              <button onclick="updateInvestmentStatus(${req.id}, 'Approved')" class="bg-emerald-600 hover:bg-emerald-500 px-3 py-1 rounded text-xs font-semibold text-white transition">Approve</button>
+              <button onclick="updateInvestmentStatus(${req.id}, 'Rejected')" class="bg-rose-600 hover:bg-rose-500 px-3 py-1 rounded text-xs font-semibold text-white transition">Reject</button>
             </td>
           </tr>
         `;
-      });
+      }).join('');
     }
 
-    async function updateStatus(id, newStatus) {
-      await _supabase.from('user_investments').update({ status: newStatus }).eq('id', id);
-      fetchRequests();
+    // --- Update Investment Status ---
+    async function updateInvestmentStatus(id, newStatus) {
+      const { error } = await _supabase
+        .from('user_investments')
+        .update({ status: newStatus })
+        .eq('id', id);
+
+      if (error) {
+        alert("Error updating status: " + error.message);
+      } else {
+        fetchInvestmentRequests();
+      }
     }
 
-    fetchRequests();
+    // --- 2. Fetch Withdrawal Requests ---
+    async function fetchWithdrawalRequests() {
+      const tableBody = document.getElementById('withdrawal-list');
+
+      const { data, error } = await _supabase
+        .from('user_withdrawals')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        tableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-rose-400">Error: ${error.message}</td></tr>`;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-500">No withdrawal requests found.</td></tr>';
+        return;
+      }
+
+      tableBody.innerHTML = data.map(req => {
+        let statusBadge = 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+        if (req.status === 'Approved') statusBadge = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+        if (req.status === 'Rejected') statusBadge = 'bg-rose-500/20 text-rose-400 border-rose-500/30';
+
+        const dateStr = req.created_at ? new Date(req.created_at).toLocaleDateString() : 'N/A';
+
+        return `
+          <tr class="hover:bg-slate-800/60">
+            <td class="p-3 font-medium text-slate-200">${req.user_name || 'N/A'}</td>
+            <td class="p-3 font-semibold text-amber-400 text-xs">${req.payment_method || 'N/A'}</td>
+            <td class="p-3 text-slate-300 text-xs">${req.account_title || 'N/A'}</td>
+            <td class="p-3 font-mono text-xs text-slate-300">${req.account_number || 'N/A'}</td>
+            <td class="p-3 font-bold text-emerald-400">PKR ${req.amount_pkr || 0}</td>
+            <td class="p-3 text-slate-400 text-xs">${dateStr}</td>
+            <td class="p-3">
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold border ${statusBadge}">
+                ${req.status || 'Pending'}
+              </span>
+            </td>
+            <td class="p-3 space-x-2">
+              <button onclick="updateWithdrawalStatus(${req.id}, 'Approved')" class="bg-emerald-600 hover:bg-emerald-500 px-3 py-1 rounded text-xs font-semibold text-white transition">Approve</button>
+              <button onclick="updateWithdrawalStatus(${req.id}, 'Rejected')" class="bg-rose-600 hover:bg-rose-500 px-3 py-1 rounded text-xs font-semibold text-white transition">Reject</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // --- Update Withdrawal Status ---
+    async function updateWithdrawalStatus(id, newStatus) {
+      const { error } = await _supabase
+        .from('user_withdrawals')
+        .update({ status: newStatus })
+        .eq('id', id);
+
+      if (error) {
+        alert("Error updating status: " + error.message);
+      } else {
+        fetchWithdrawalRequests();
+      }
+    }
+
+    // Load all data on page view
+    fetchAllData();
   </script>
 </body>
 </html>
