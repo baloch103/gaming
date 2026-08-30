@@ -32,8 +32,8 @@
   </div>
 
   <script>
-    const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
-    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const SUPABASE_URL = 'https://rrinvfjkvepclqesxaox.supabase.co';
+    const SUPABASE_KEY = 'sb_secret_2TD9Pav_gFVgTf2VuT-Duw_MNvFu1YO';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     async function fetchRequests() {
