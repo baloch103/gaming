@@ -7,15 +7,17 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-900 text-white font-sans">
+<body class="bg-slate-900 text-white font-sans selection:bg-emerald-500 selection:text-slate-900">
 
   <!-- Header -->
-  <header class="p-5 bg-slate-800 shadow-md border-b border-slate-700 flex justify-between items-center">
-    <h1 class="text-2xl font-bold text-emerald-400">ProfitInvest PKR</h1>
+  <header class="p-5 bg-slate-800 border-b border-slate-700 flex justify-between items-center sticky top-0 z-40 shadow-lg">
+    <h1 class="text-2xl font-bold text-emerald-400 tracking-wide">ProfitInvest PKR</h1>
+    
     <div id="auth-buttons" class="space-x-2">
       <button onclick="openModal('login')" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg text-sm font-medium transition">Login</button>
       <button onclick="openModal('register')" class="bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-lg text-sm font-medium transition">Register</button>
     </div>
+
     <div id="user-info" class="hidden flex items-center space-x-4">
       <span id="user-email" class="text-emerald-400 text-sm font-semibold"></span>
       <button onclick="logout()" class="bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-lg text-xs font-medium transition">Logout</button>
@@ -26,7 +28,7 @@
   <section id="user-dashboard" class="hidden max-w-6xl mx-auto px-4 pt-8">
     
     <!-- Balance & Quick Actions Card -->
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8 flex flex-col md:flex-row justify-between items-center gap-4 shadow-xl">
       <div>
         <p class="text-xs text-slate-400 uppercase font-semibold">Total Approved Profit / Available Balance</p>
         <h3 id="user-balance" class="text-3xl font-extrabold text-emerald-400 mt-1">PKR 0</h3>
@@ -40,7 +42,7 @@
     </div>
 
     <!-- Active Investments Table -->
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8 shadow-xl">
       <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
         <h3 class="text-xl font-bold text-emerald-400">My Investment History</h3>
       </div>
@@ -66,7 +68,7 @@
     </div>
 
     <!-- Withdrawal History Table -->
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8 shadow-xl">
       <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
         <h3 class="text-xl font-bold text-emerald-400">My Withdrawal History (ويٿڊرا رڪارڊ)</h3>
       </div>
@@ -103,7 +105,7 @@
   <section id="packages" class="max-w-6xl mx-auto px-4 pb-20 grid grid-cols-1 md:grid-cols-3 gap-8">
     
     <!-- Package 1 -->
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
       <div>
         <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 1</h3>
         <p class="text-3xl font-extrabold mb-4">PKR 280 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
@@ -117,7 +119,7 @@
     </div>
 
     <!-- Package 2 -->
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
       <div>
         <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 2</h3>
         <p class="text-3xl font-extrabold mb-4">PKR 780 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
@@ -131,7 +133,7 @@
     </div>
 
     <!-- Package 3 -->
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
       <div>
         <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 3</h3>
         <p class="text-3xl font-extrabold mb-4">PKR 1,480 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
@@ -145,7 +147,7 @@
     </div>
 
     <!-- Package 4 -->
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
       <div>
         <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 4</h3>
         <p class="text-3xl font-extrabold mb-4">PKR 3,180 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
@@ -159,7 +161,7 @@
     </div>
 
     <!-- Package 5 -->
-    <div class="bg-slate-800 border border-emerald-500/50 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition relative overflow-hidden">
+    <div class="bg-slate-800 border border-emerald-500/50 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition relative overflow-hidden shadow-lg">
       <span class="absolute top-3 right-3 bg-emerald-500/20 text-emerald-400 text-xs px-2.5 py-1 rounded-full font-bold">VIP</span>
       <div>
         <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 5</h3>
@@ -176,8 +178,8 @@
   </section>
 
   <!-- Withdraw Modal -->
-  <div id="withdraw-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl w-full max-w-md relative">
+  <div id="withdraw-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+    <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl w-full max-w-md relative shadow-2xl">
       <button onclick="closeWithdrawModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
       
       <h3 class="text-2xl font-bold text-emerald-400 mb-4">Request Withdrawal</h3>
@@ -209,8 +211,8 @@
   </div>
 
   <!-- Deposit Payment Modal -->
-  <div id="deposit-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl w-full max-w-md relative">
+  <div id="deposit-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+    <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl w-full max-w-md relative shadow-2xl">
       <button onclick="closeDepositModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
       
       <h3 class="text-2xl font-bold text-emerald-400 mb-2">Deposit Payment</h3>
@@ -221,7 +223,7 @@
         <p class="text-sm font-bold text-white mb-2">JazzCash</p>
         
         <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Account Title</p>
-        <p class="text-sm font-bold text-white mb-3">Null</p>
+        <p class="text-sm font-bold text-white mb-3">ProfitInvest Business</p>
         
         <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Account Number</p>
         <div class="flex items-center justify-between bg-slate-800 border border-slate-700 rounded-lg p-2">
@@ -245,8 +247,8 @@
   </div>
 
   <!-- Auth Modal -->
-  <div id="auth-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl w-full max-w-md relative">
+  <div id="auth-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+    <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl w-full max-w-md relative shadow-2xl">
       <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
       <h3 id="modal-title" class="text-2xl font-bold text-emerald-400 mb-4">Login</h3>
       
@@ -326,17 +328,26 @@
 
       if (!data || data.length === 0) {
         listContainer.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">No investment history found.</td></tr>';
+        document.getElementById('user-balance').innerText = `PKR 0`;
         return;
       }
 
       let calculatedBalance = 0;
+      const now = new Date().getTime();
 
       listContainer.innerHTML = data.map((item, index) => {
         let statusColor = 'text-amber-400 bg-amber-500/10 border-amber-500/30';
+        
         if (item.status === 'Approved') {
           statusColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
-          calculatedBalance += Number(item.daily_profit || 0);
+          
+          // Accurate profit calculation per day passed
+          const createdTime = new Date(item.created_at).getTime();
+          const daysPassed = Math.floor((now - createdTime) / (1000 * 60 * 60 * 24));
+          const earnedDays = Math.min(Math.max(daysPassed, 1), 60); // Cap at 60 days
+          calculatedBalance += Number(item.daily_profit || 0) * earnedDays;
         }
+        
         if (item.status === 'Rejected') statusColor = 'text-rose-400 bg-rose-500/10 border-rose-500/30';
 
         const timerId = `timer-${index}`;
@@ -357,7 +368,7 @@
         `;
       }).join('');
 
-      document.getElementById('user-balance').innerText = `PKR ${calculatedBalance}`;
+      document.getElementById('user-balance').innerText = `PKR ${calculatedBalance.toLocaleString()}`;
 
       data.forEach((item, index) => {
         startCountdown(`timer-${index}`, item.created_at, item.status);
@@ -413,12 +424,12 @@
       if (!element) return;
 
       if (status === 'Pending') {
-        element.innerHTML = '<span class="text-slate-500">Awaiting Approval</span>';
+        element.innerHTML = '<span class="text-slate-500 font-normal">Awaiting Approval</span>';
         return;
       }
 
       if (status === 'Rejected') {
-        element.innerHTML = '<span class="text-rose-500">Rejected</span>';
+        element.innerHTML = '<span class="text-rose-500 font-normal">Rejected</span>';
         return;
       }
 
@@ -430,7 +441,7 @@
         const dayInMs = 24 * 60 * 60 * 1000;
         const remaining = dayInMs - (elapsed % dayInMs);
 
-        const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const hours = Math.floor(remaining / (1000 * 60 * 60));
         const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
 
