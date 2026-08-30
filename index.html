@@ -68,7 +68,7 @@
     <!-- Withdrawal History Table -->
     <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8">
       <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
-        <h3 class="text-xl font-bold text-emerald-400">My Withdrawal History</h3>
+        <h3 class="text-xl font-bold text-emerald-400">My Withdrawal History (ويٿڊرا رڪارڊ)</h3>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm text-slate-300">
@@ -375,7 +375,7 @@
         .order('created_at', { ascending: false });
 
       if (error) {
-        listContainer.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Withdrawal history table non-existent or empty.</td></tr>`;
+        listContainer.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-400">Error fetching withdrawals: ${error.message}</td></tr>`;
         return;
       }
 
