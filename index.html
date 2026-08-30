@@ -22,14 +22,28 @@
     </div>
   </header>
 
-  <!-- User Active Investments & History Section -->
+  <!-- User Dashboard Section -->
   <section id="user-dashboard" class="hidden max-w-6xl mx-auto px-4 pt-8">
+    
+    <!-- Balance & Quick Actions Card -->
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div>
+        <p class="text-xs text-slate-400 uppercase font-semibold">Total Approved Profit / Available Balance</p>
+        <h3 id="user-balance" class="text-3xl font-extrabold text-emerald-400 mt-1">PKR 0</h3>
+      </div>
+      <div class="flex gap-3 w-full md:w-auto">
+        <button onclick="loadUserData()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2.5 rounded-lg text-sm font-semibold transition">🔄 Refresh</button>
+        <button onclick="openWithdrawModal()" class="bg-emerald-500 hover:bg-emerald-600 px-5 py-2.5 rounded-lg text-sm font-bold transition flex items-center gap-2">
+          💸 Withdraw Profit
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Investments Table -->
     <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8">
       <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
         <h3 class="text-xl font-bold text-emerald-400">My Investment History</h3>
-        <button onclick="loadUserInvestments()" class="text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded text-slate-300">🔄 Refresh History</button>
       </div>
-      
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm text-slate-300">
           <thead class="bg-slate-900 text-slate-400 uppercase text-xs">
@@ -50,6 +64,33 @@
         </table>
       </div>
     </div>
+
+    <!-- Withdrawal History Table -->
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8">
+      <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
+        <h3 class="text-xl font-bold text-emerald-400">My Withdrawal History</h3>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-900 text-slate-400 uppercase text-xs">
+            <tr>
+              <th class="p-3">Amount</th>
+              <th class="p-3">Method</th>
+              <th class="p-3">Account Title</th>
+              <th class="p-3">Account No</th>
+              <th class="p-3">Date</th>
+              <th class="p-3">Status</th>
+            </tr>
+          </thead>
+          <tbody id="user-withdrawals-list">
+            <tr>
+              <td colspan="6" class="p-4 text-center text-slate-500">Loading withdrawals...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </section>
 
   <!-- Hero Section -->
@@ -134,6 +175,39 @@
 
   </section>
 
+  <!-- Withdraw Modal -->
+  <div id="withdraw-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl w-full max-w-md relative">
+      <button onclick="closeWithdrawModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
+      
+      <h3 class="text-2xl font-bold text-emerald-400 mb-4">Request Withdrawal</h3>
+      
+      <form onsubmit="handleWithdrawSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1 text-slate-300">Payment Gateway</label>
+          <select id="withdraw-method" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
+            <option value="Easypaisa">Easypaisa</option>
+            <option value="JazzCash">JazzCash</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1 text-slate-300">Account Title (نالو)</label>
+          <input type="text" id="withdraw-title" required placeholder="e.g. Ali Raza" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1 text-slate-300">Account Number (نمبر)</label>
+          <input type="text" id="withdraw-number" required placeholder="e.g. 03001234567" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1 text-slate-300">Withdraw Amount (PKR)</label>
+          <input type="number" id="withdraw-amount" min="100" required placeholder="Min 100 PKR" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
+        </div>
+        
+        <button type="submit" id="withdraw-submit-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Submit Withdrawal Request</button>
+      </form>
+    </div>
+  </div>
+
   <!-- Deposit Payment Modal -->
   <div id="deposit-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl w-full max-w-md relative">
@@ -142,17 +216,16 @@
       <h3 class="text-2xl font-bold text-emerald-400 mb-2">Deposit Payment</h3>
       <p id="selected-package-info" class="text-sm font-semibold text-slate-300 mb-4"></p>
 
-      <!-- Bank/Wallet Details Box -->
       <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 mb-4 text-left">
         <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Payment Method</p>
-        <p class="text-sm font-bold text-white mb-2">NayaPay</p>
+        <p class="text-sm font-bold text-white mb-2">JazzCash</p>
         
         <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Account Title</p>
-        <p class="text-sm font-bold text-white mb-3">ali Akbr</p>
+        <p class="text-sm font-bold text-white mb-3">Null</p>
         
         <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Account Number</p>
         <div class="flex items-center justify-between bg-slate-800 border border-slate-700 rounded-lg p-2">
-          <span id="accNumber" class="font-mono text-emerald-400 font-bold text-base">03003152236</span>
+          <span id="accNumber" class="font-mono text-emerald-400 font-bold text-base">030000009</span>
           <button onclick="copyAccountNo()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition">Copy</button>
         </div>
       </div>
@@ -161,7 +234,6 @@
         💡 Send the exact deposit amount to the account above, paste your <strong>Transaction ID (Trx ID)</strong> below, and click Submit.
       </p>
 
-      <!-- Form -->
       <form onsubmit="handleDepositSubmit(event)" class="space-y-4">
         <div>
           <label class="block text-sm font-medium mb-1 text-slate-300 text-left">Transaction ID (Trx ID)</label>
@@ -215,7 +287,7 @@
         document.getElementById('user-info').classList.remove('hidden');
         document.getElementById('user-email').innerText = user.email;
         document.getElementById('user-dashboard').classList.remove('hidden');
-        loadUserInvestments();
+        loadUserData();
       } else {
         currentUser = null;
         document.getElementById('auth-buttons').classList.remove('hidden');
@@ -230,12 +302,16 @@
       countdownIntervals = [];
     }
 
-    async function loadUserInvestments() {
+    async function loadUserData() {
       if (!currentUser) return;
-      clearAllIntervals();
+      loadUserInvestments();
+      loadUserWithdrawals();
+    }
 
+    async function loadUserInvestments() {
+      clearAllIntervals();
       const listContainer = document.getElementById('user-investments-list');
-      listContainer.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Loading...</td></tr>';
+      listContainer.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Loading investments...</td></tr>';
 
       const { data, error } = await _supabase
         .from('user_investments')
@@ -244,7 +320,7 @@
         .order('created_at', { ascending: false });
 
       if (error) {
-        listContainer.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-400">Error loading history: ${error.message}</td></tr>`;
+        listContainer.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-400">Error loading investments: ${error.message}</td></tr>`;
         return;
       }
 
@@ -253,9 +329,14 @@
         return;
       }
 
+      let calculatedBalance = 0;
+
       listContainer.innerHTML = data.map((item, index) => {
         let statusColor = 'text-amber-400 bg-amber-500/10 border-amber-500/30';
-        if (item.status === 'Approved') statusColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
+        if (item.status === 'Approved') {
+          statusColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
+          calculatedBalance += Number(item.daily_profit || 0);
+        }
         if (item.status === 'Rejected') statusColor = 'text-rose-400 bg-rose-500/10 border-rose-500/30';
 
         const timerId = `timer-${index}`;
@@ -276,10 +357,55 @@
         `;
       }).join('');
 
-      // Start countdown timers for each investment
+      document.getElementById('user-balance').innerText = `PKR ${calculatedBalance}`;
+
       data.forEach((item, index) => {
         startCountdown(`timer-${index}`, item.created_at, item.status);
       });
+    }
+
+    async function loadUserWithdrawals() {
+      const listContainer = document.getElementById('user-withdrawals-list');
+      listContainer.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Loading withdrawals...</td></tr>';
+
+      const { data, error } = await _supabase
+        .from('user_withdrawals')
+        .select('*')
+        .eq('user_name', currentUser.email)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        listContainer.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Withdrawal history table non-existent or empty.</td></tr>`;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        listContainer.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">No withdrawal requests found.</td></tr>';
+        return;
+      }
+
+      listContainer.innerHTML = data.map(item => {
+        let statusColor = 'text-amber-400 bg-amber-500/10 border-amber-500/30';
+        if (item.status === 'Approved') statusColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
+        if (item.status === 'Rejected') statusColor = 'text-rose-400 bg-rose-500/10 border-rose-500/30';
+
+        const dateStr = item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A';
+
+        return `
+          <tr class="border-b border-slate-700/50 hover:bg-slate-800/50">
+            <td class="p-3 font-bold text-emerald-400">PKR ${item.amount_pkr || 0}</td>
+            <td class="p-3 text-xs font-semibold">${item.payment_method || 'N/A'}</td>
+            <td class="p-3 text-xs text-slate-300">${item.account_title || 'N/A'}</td>
+            <td class="p-3 font-mono text-xs text-slate-300">${item.account_number || 'N/A'}</td>
+            <td class="p-3 text-xs text-slate-400">${dateStr}</td>
+            <td class="p-3">
+              <span class="px-2.5 py-1 text-xs rounded-full border ${statusColor} font-semibold">
+                ${item.status || 'Pending'}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
     function startCountdown(elementId, createdAt, status) {
@@ -302,8 +428,6 @@
         const now = new Date().getTime();
         const elapsed = now - createdTime;
         const dayInMs = 24 * 60 * 60 * 1000;
-        
-        // Calculate remaining time for the current 24-hour cycle
         const remaining = dayInMs - (elapsed % dayInMs);
 
         const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -320,6 +444,62 @@
       timerFunc();
       const interval = setInterval(timerFunc, 1000);
       countdownIntervals.push(interval);
+    }
+
+    function openWithdrawModal() {
+      if (!currentUser) {
+        alert("Please Login first!");
+        openModal('login');
+        return;
+      }
+      document.getElementById('withdraw-modal').classList.remove('hidden');
+    }
+
+    function closeWithdrawModal() {
+      document.getElementById('withdraw-modal').classList.add('hidden');
+    }
+
+    async function handleWithdrawSubmit(e) {
+      e.preventDefault();
+      const method = document.getElementById('withdraw-method').value;
+      const title = document.getElementById('withdraw-title').value.trim();
+      const number = document.getElementById('withdraw-number').value.trim();
+      const amount = document.getElementById('withdraw-amount').value;
+      const submitBtn = document.getElementById('withdraw-submit-btn');
+
+      if (!title || !number || !amount) {
+        alert("Please fill all details.");
+        return;
+      }
+
+      submitBtn.innerText = "Submitting Request...";
+      submitBtn.disabled = true;
+
+      try {
+        const { data, error } = await _supabase
+          .from('user_withdrawals')
+          .insert([{
+            user_name: currentUser.email,
+            payment_method: method,
+            account_title: title,
+            account_number: number,
+            amount_pkr: Number(amount),
+            status: 'Pending'
+          }]);
+
+        if (error) {
+          alert("Error submitting withdrawal: " + error.message);
+        } else {
+          alert(`Withdrawal request for PKR ${amount} submitted successfully!`);
+          closeWithdrawModal();
+          loadUserWithdrawals();
+        }
+      } catch (err) {
+        alert("Unexpected error: " + err.message);
+      } finally {
+        submitBtn.innerText = "Submit Withdrawal Request";
+        submitBtn.disabled = false;
+      }
     }
 
     function openModal(mode) {
@@ -432,7 +612,7 @@
         } else {
           alert(`Success! Deposit request for ${selectedPkg.name} submitted.`);
           closeDepositModal();
-          loadUserInvestments();
+          loadUserData();
         }
       } catch (err) {
         alert("Unexpected error: " + err.message);
