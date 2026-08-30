@@ -36,14 +36,15 @@
             <tr>
               <th class="p-3">Package</th>
               <th class="p-3">Amount</th>
+              <th class="p-3">Daily Profit</th>
               <th class="p-3">Trx ID</th>
-              <th class="p-3">Date</th>
+              <th class="p-3">Next Profit In</th>
               <th class="p-3">Status</th>
             </tr>
           </thead>
           <tbody id="user-investments-list">
             <tr>
-              <td colspan="5" class="p-4 text-center text-slate-500">Loading investments...</td>
+              <td colspan="6" class="p-4 text-center text-slate-500">Loading investments...</td>
             </tr>
           </tbody>
         </table>
@@ -71,7 +72,7 @@
           <li>✔ Total Return: <strong class="text-emerald-400">PKR 5,580</strong></li>
         </ul>
       </div>
-      <button onclick="subscribePackage('Package 1', 280)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
+      <button onclick="subscribePackage('Package 1', 280, 93)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
     </div>
 
     <!-- Package 2 -->
@@ -85,7 +86,7 @@
           <li>✔ Total Return: <strong class="text-emerald-400">PKR 15,600</strong></li>
         </ul>
       </div>
-      <button onclick="subscribePackage('Package 2', 780)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
+      <button onclick="subscribePackage('Package 2', 780, 260)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
     </div>
 
     <!-- Package 3 -->
@@ -99,7 +100,7 @@
           <li>✔ Total Return: <strong class="text-emerald-400">PKR 29,580</strong></li>
         </ul>
       </div>
-      <button onclick="subscribePackage('Package 3', 1480)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
+      <button onclick="subscribePackage('Package 3', 1480, 493)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
     </div>
 
     <!-- Package 4 -->
@@ -113,7 +114,7 @@
           <li>✔ Total Return: <strong class="text-emerald-400">PKR 63,600</strong></li>
         </ul>
       </div>
-      <button onclick="subscribePackage('Package 4', 3180)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
+      <button onclick="subscribePackage('Package 4', 3180, 1060)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
     </div>
 
     <!-- Package 5 -->
@@ -128,7 +129,7 @@
           <li>✔ Total Return: <strong class="text-emerald-400">PKR 123,600</strong></li>
         </ul>
       </div>
-      <button onclick="subscribePackage('Package 5', 6180)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
+      <button onclick="subscribePackage('Package 5', 6180, 2060)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
     </div>
 
   </section>
@@ -144,14 +145,14 @@
       <!-- Bank/Wallet Details Box -->
       <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 mb-4 text-left">
         <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Payment Method</p>
-        <p class="text-sm font-bold text-white mb-2">Easypaisa</p>
+        <p class="text-sm font-bold text-white mb-2">NayaPay</p>
         
         <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Account Title</p>
-        <p class="text-sm font-bold text-white mb-3">Asghar Ali</p>
+        <p class="text-sm font-bold text-white mb-3">ali Akbr</p>
         
         <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Account Number</p>
         <div class="flex items-center justify-between bg-slate-800 border border-slate-700 rounded-lg p-2">
-          <span id="accNumber" class="font-mono text-emerald-400 font-bold text-base">03363152236</span>
+          <span id="accNumber" class="font-mono text-emerald-400 font-bold text-base">03003152236</span>
           <button onclick="copyAccountNo()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition">Copy</button>
         </div>
       </div>
@@ -171,7 +172,7 @@
     </div>
   </div>
 
-  <!-- Auth Modal (Popup Window for Login/Register) -->
+  <!-- Auth Modal -->
   <div id="auth-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl w-full max-w-md relative">
       <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
@@ -203,7 +204,8 @@
 
     let currentMode = 'login';
     let currentUser = null;
-    let selectedPkg = { name: '', amount: 0 };
+    let selectedPkg = { name: '', amount: 0, dailyProfit: 0 };
+    let countdownIntervals = [];
 
     async function checkUser() {
       const { data: { user } } = await _supabase.auth.getUser();
@@ -223,10 +225,17 @@
     }
     checkUser();
 
+    function clearAllIntervals() {
+      countdownIntervals.forEach(clearInterval);
+      countdownIntervals = [];
+    }
+
     async function loadUserInvestments() {
       if (!currentUser) return;
+      clearAllIntervals();
+
       const listContainer = document.getElementById('user-investments-list');
-      listContainer.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">Loading...</td></tr>';
+      listContainer.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Loading...</td></tr>';
 
       const { data, error } = await _supabase
         .from('user_investments')
@@ -235,28 +244,29 @@
         .order('created_at', { ascending: false });
 
       if (error) {
-        listContainer.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-400">Error loading history: ${error.message}</td></tr>`;
+        listContainer.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-400">Error loading history: ${error.message}</td></tr>`;
         return;
       }
 
       if (!data || data.length === 0) {
-        listContainer.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">No investment history found.</td></tr>';
+        listContainer.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">No investment history found.</td></tr>';
         return;
       }
 
-      listContainer.innerHTML = data.map(item => {
+      listContainer.innerHTML = data.map((item, index) => {
         let statusColor = 'text-amber-400 bg-amber-500/10 border-amber-500/30';
         if (item.status === 'Approved') statusColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
         if (item.status === 'Rejected') statusColor = 'text-rose-400 bg-rose-500/10 border-rose-500/30';
 
-        const dateStr = item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A';
+        const timerId = `timer-${index}`;
 
         return `
           <tr class="border-b border-slate-700/50 hover:bg-slate-800/50">
             <td class="p-3 font-semibold text-emerald-400">${item.package_name || 'N/A'}</td>
             <td class="p-3 font-bold">PKR ${item.amount_pkr || 0}</td>
+            <td class="p-3 text-emerald-300 font-semibold">+PKR ${item.daily_profit || 0}/day</td>
             <td class="p-3 font-mono text-xs text-slate-300">${item.trx_id || 'N/A'}</td>
-            <td class="p-3 text-slate-400 text-xs">${dateStr}</td>
+            <td class="p-3 font-mono text-xs text-amber-400 font-bold" id="${timerId}">Calculating...</td>
             <td class="p-3">
               <span class="px-2.5 py-1 text-xs rounded-full border ${statusColor} font-semibold">
                 ${item.status || 'Pending'}
@@ -265,6 +275,51 @@
           </tr>
         `;
       }).join('');
+
+      // Start countdown timers for each investment
+      data.forEach((item, index) => {
+        startCountdown(`timer-${index}`, item.created_at, item.status);
+      });
+    }
+
+    function startCountdown(elementId, createdAt, status) {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+
+      if (status === 'Pending') {
+        element.innerHTML = '<span class="text-slate-500">Awaiting Approval</span>';
+        return;
+      }
+
+      if (status === 'Rejected') {
+        element.innerHTML = '<span class="text-rose-500">Rejected</span>';
+        return;
+      }
+
+      const createdTime = new Date(createdAt).getTime();
+
+      const timerFunc = () => {
+        const now = new Date().getTime();
+        const elapsed = now - createdTime;
+        const dayInMs = 24 * 60 * 60 * 1000;
+        
+        // Calculate remaining time for the current 24-hour cycle
+        const remaining = dayInMs - (elapsed % dayInMs);
+
+        const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+
+        const formattedH = String(hours).padStart(2, '0');
+        const formattedM = String(minutes).padStart(2, '0');
+        const formattedS = String(seconds).padStart(2, '0');
+
+        element.innerHTML = `⏱️ ${formattedH}:${formattedM}:${formattedS}`;
+      };
+
+      timerFunc();
+      const interval = setInterval(timerFunc, 1000);
+      countdownIntervals.push(interval);
     }
 
     function openModal(mode) {
@@ -321,15 +376,15 @@
       checkUser();
     }
 
-    function subscribePackage(pkgName, amount) {
+    function subscribePackage(pkgName, amount, dailyProfit) {
       if (!currentUser) {
         alert("Please Login or Register an account first to invest!");
         openModal('login');
         return;
       }
 
-      selectedPkg = { name: pkgName, amount: amount };
-      document.getElementById('selected-package-info').innerText = `Selected: ${pkgName} (PKR ${amount})`;
+      selectedPkg = { name: pkgName, amount: amount, dailyProfit: dailyProfit };
+      document.getElementById('selected-package-info').innerText = `Selected: ${pkgName} (PKR ${amount}) - Profit: PKR ${dailyProfit}/day`;
       document.getElementById('trx-id-input').value = '';
       document.getElementById('deposit-modal').classList.remove('hidden');
     }
@@ -360,25 +415,30 @@
       submitBtn.innerText = "Submitting...";
       submitBtn.disabled = true;
 
-      const { data, error } = await _supabase
-        .from('user_investments')
-        .insert([{ 
-          user_name: currentUser.email, 
-          package_name: selectedPkg.name, 
-          amount_pkr: selectedPkg.amount, 
-          trx_id: trxId,
-          status: 'Pending' 
-        }]);
+      try {
+        const { data, error } = await _supabase
+          .from('user_investments')
+          .insert([{ 
+            user_name: currentUser.email, 
+            package_name: selectedPkg.name, 
+            amount_pkr: Number(selectedPkg.amount), 
+            daily_profit: Number(selectedPkg.dailyProfit),
+            trx_id: trxId,
+            status: 'Pending' 
+          }]);
 
-      submitBtn.innerText = "Submit Deposit Request";
-      submitBtn.disabled = false;
-
-      if (error) {
-        alert("Error submitting request: " + error.message);
-      } else {
-        alert(`Success! Deposit request for ${selectedPkg.name} (PKR ${selectedPkg.amount}) with Trx ID "${trxId}" has been submitted.`);
-        closeDepositModal();
-        loadUserInvestments();
+        if (error) {
+          alert("Error submitting request: " + error.message);
+        } else {
+          alert(`Success! Deposit request for ${selectedPkg.name} submitted.`);
+          closeDepositModal();
+          loadUserInvestments();
+        }
+      } catch (err) {
+        alert("Unexpected error: " + err.message);
+      } finally {
+        submitBtn.innerText = "Submit Deposit Request";
+        submitBtn.disabled = false;
       }
     }
   </script>
