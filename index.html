@@ -104,10 +104,50 @@
 
   </section>
 
-  <!-- Auth Modal (Popup Window for Login/Register) -->
-  <div id="auth-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4">
+  <!-- Deposit Payment Modal -->
+  <div id="deposit-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl w-full max-w-md relative">
-      <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">✕</button>
+      <button onclick="closeDepositModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
+      
+      <h3 class="text-2xl font-bold text-emerald-400 mb-2">Deposit Payment</h3>
+      <p id="selected-package-info" class="text-sm font-semibold text-slate-300 mb-4"></p>
+
+      <!-- Bank/Wallet Details Box -->
+      <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 mb-4 text-left">
+        <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Payment Method</p>
+        <p class="text-sm font-bold text-white mb-2">Easypaisa / JazzCash</p>
+        
+        <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Account Title</p>
+        <!-- CHANGE YOUR ACCOUNT NAME HERE -->
+        <p class="text-sm font-bold text-white mb-3">Ufone Franchise / Ali Raza</p>
+        
+        <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Account Number</p>
+        <div class="flex items-center justify-between bg-slate-800 border border-slate-700 rounded-lg p-2">
+          <!-- CHANGE YOUR ACCOUNT NUMBER HERE -->
+          <span id="accNumber" class="font-mono text-emerald-400 font-bold text-base">03331234567</span>
+          <button onclick="copyAccountNo()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition">Copy</button>
+        </div>
+      </div>
+
+      <p class="text-xs text-slate-400 mb-4 text-left leading-relaxed">
+        💡 Send the exact deposit amount to the account above, paste your <strong>Transaction ID (Trx ID)</strong> below, and click Submit.
+      </p>
+
+      <!-- Form -->
+      <form onsubmit="handleDepositSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1 text-slate-300 text-left">Transaction ID (Trx ID)</label>
+          <input type="text" id="trx-id-input" required placeholder="e.g. 98234712093" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
+        </div>
+        <button type="submit" id="deposit-submit-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Submit Deposit Request</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Auth Modal (Popup Window for Login/Register) -->
+  <div id="auth-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl w-full max-w-md relative">
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
       <h3 id="modal-title" class="text-2xl font-bold text-emerald-400 mb-4">Login</h3>
       
       <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
@@ -137,6 +177,7 @@
 
     let currentMode = 'login';
     let currentUser = null;
+    let selectedPkg = { name: '', amount: 0 };
 
     // Check user session on page load
     async function checkUser() {
@@ -208,21 +249,65 @@
       checkUser();
     }
 
-    async function subscribePackage(pkgName, amount) {
+    // Triggered when user clicks "Invest Now"
+    function subscribePackage(pkgName, amount) {
       if (!currentUser) {
         alert("Please Login or Register an account first to invest!");
         openModal('login');
         return;
       }
 
+      selectedPkg = { name: pkgName, amount: amount };
+      document.getElementById('selected-package-info').innerText = `Selected: ${pkgName} (PKR ${amount})`;
+      document.getElementById('trx-id-input').value = '';
+      document.getElementById('deposit-modal').classList.remove('hidden');
+    }
+
+    function closeDepositModal() {
+      document.getElementById('deposit-modal').classList.add('hidden');
+    }
+
+    function copyAccountNo() {
+      const accNum = document.getElementById("accNumber").innerText;
+      navigator.clipboard.writeText(accNum).then(() => {
+        alert("Account number copied: " + accNum);
+      }).catch(() => {
+        alert("Failed to copy. Please copy manually: " + accNum);
+      });
+    }
+
+    // Handles submitting deposit request to Supabase
+    async function handleDepositSubmit(e) {
+      e.preventDefault();
+      const trxId = document.getElementById('trx-id-input').value.trim();
+      const submitBtn = document.getElementById('deposit-submit-btn');
+
+      if (!trxId) {
+        alert("Please enter a valid Transaction ID.");
+        return;
+      }
+
+      submitBtn.innerText = "Submitting...";
+      submitBtn.disabled = true;
+
       const { data, error } = await _supabase
         .from('user_investments')
-        .insert([{ user_name: currentUser.email, package_name: pkgName, amount_pkr: amount, status: 'Pending' }]);
+        .insert([{ 
+          user_name: currentUser.email, 
+          package_name: selectedPkg.name, 
+          amount_pkr: selectedPkg.amount, 
+          trx_id: trxId,
+          status: 'Pending' 
+        }]);
+
+      submitBtn.innerText = "Submit Deposit Request";
+      submitBtn.disabled = false;
 
       if (error) {
         alert("Error submitting request: " + error.message);
       } else {
-        alert(`Success! Request for ${pkgName} (PKR ${amount}) submitted under account: ${currentUser.email}`);
+        alert(`Success! Deposit request for ${selectedPkg.name} (PKR ${selectedPkg.amount}) with Trx ID "${trxId}" has been submitted.`);
+        closeDepositModal();
       }
     }
   </script>
