@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - PKR Investments</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-900 text-white p-8">
+
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 text-emerald-400">Admin Control Panel (PKR Investments)</h1>
+    
+    <div class="bg-slate-800 rounded-lg p-6 border border-slate-700">
+      <h2 class="text-xl font-semibold mb-4">Investment Requests</h2>
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="border-b border-slate-700 text-slate-400">
+            <th class="p-3">User Name / Phone</th>
+            <th class="p-3">Package</th>
+            <th class="p-3">Amount (PKR)</th>
+            <th class="p-3">Status</th>
+            <th class="p-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="request-list">
+          <!-- Dynamic Data from Supabase -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function fetchRequests() {
+      const { data, error } = await _supabase
+        .from('user_investments')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) return console.error(error);
+
+      const tableBody = document.getElementById('request-list');
+      tableBody.innerHTML = '';
+
+      data.forEach(req => {
+        tableBody.innerHTML += `
+          <tr class="border-b border-slate-700/50">
+            <td class="p-3 font-medium">${req.user_name}</td>
+            <td class="p-3">${req.package_name}</td>
+            <td class="p-3 font-bold text-emerald-400">PKR ${req.amount_pkr || '-'}</td>
+            <td class="p-3">
+              <span class="px-2.5 py-1 rounded text-xs font-bold ${req.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-400' : req.status === 'Rejected' ? 'bg-rose-500/20 text-rose-400' : 'bg-amber-500/20 text-amber-400'}">
+                ${req.status}
+              </span>
+            </td>
+            <td class="p-3 space-x-2">
+              <button onclick="updateStatus('${req.id}', 'Approved')" class="bg-emerald-600 px-3 py-1 rounded text-xs font-semibold hover:bg-emerald-500">Approve</button>
+              <button onclick="updateStatus('${req.id}', 'Rejected')" class="bg-rose-600 px-3 py-1 rounded text-xs font-semibold hover:bg-rose-500">Reject</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    async function updateStatus(id, newStatus) {
+      await _supabase.from('user_investments').update({ status: newStatus }).eq('id', id);
+      fetchRequests();
+    }
+
+    fetchRequests();
+  </script>
+</body>
+</html>
