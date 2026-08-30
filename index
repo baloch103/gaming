@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Investment Plans Platform - PKR</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-900 text-white font-sans">
+
+  <!-- Header -->
+  <header class="p-5 bg-slate-800 shadow-md border-b border-slate-700 flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-emerald-400">ProfitInvest PKR</h1>
+    <a href="#packages" class="bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-lg text-sm font-medium transition">View Plans</a>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="text-center py-16 px-4">
+    <h2 class="text-4xl font-extrabold mb-4">Secure & High Yield Investment Plans</h2>
+    <p class="text-slate-400 max-w-xl mx-auto mb-8">Select your package in PKR, start earning daily returns guaranteed for 60 days.</p>
+  </section>
+
+  <!-- Packages Grid -->
+  <section id="packages" class="max-w-6xl mx-auto px-4 pb-20 grid grid-cols-1 md:grid-cols-3 gap-8">
+    
+    <!-- Package 1 -->
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition">
+      <div>
+        <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 1</h3>
+        <p class="text-3xl font-extrabold mb-4">PKR 280 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
+        <ul class="text-slate-300 space-y-2 mb-6 text-sm">
+          <li>✔ Daily Return: <strong>PKR 93</strong></li>
+          <li>✔ Duration: <strong>60 Days</strong></li>
+          <li>✔ Total Return: <strong class="text-emerald-400">PKR 5,580</strong></li>
+        </ul>
+      </div>
+      <button onclick="subscribePackage('Package 1', 280)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
+    </div>
+
+    <!-- Package 2 -->
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition">
+      <div>
+        <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 2</h3>
+        <p class="text-3xl font-extrabold mb-4">PKR 780 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
+        <ul class="text-slate-300 space-y-2 mb-6 text-sm">
+          <li>✔ Daily Return: <strong>PKR 260</strong></li>
+          <li>✔ Duration: <strong>60 Days</strong></li>
+          <li>✔ Total Return: <strong class="text-emerald-400">PKR 15,600</strong></li>
+        </ul>
+      </div>
+      <button onclick="subscribePackage('Package 2', 780)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
+    </div>
+
+    <!-- Package 3 -->
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition">
+      <div>
+        <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 3</h3>
+        <p class="text-3xl font-extrabold mb-4">PKR 1,480 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
+        <ul class="text-slate-300 space-y-2 mb-6 text-sm">
+          <li>✔ Daily Return: <strong>PKR 493</strong></li>
+          <li>✔ Duration: <strong>60 Days</strong></li>
+          <li>✔ Total Return: <strong class="text-emerald-400">PKR 29,580</strong></li>
+        </ul>
+      </div>
+      <button onclick="subscribePackage('Package 3', 1480)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
+    </div>
+
+    <!-- Package 4 -->
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition">
+      <div>
+        <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 4</h3>
+        <p class="text-3xl font-extrabold mb-4">PKR 3,180 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
+        <ul class="text-slate-300 space-y-2 mb-6 text-sm">
+          <li>✔ Daily Return: <strong>PKR 1,060</strong></li>
+          <li>✔ Duration: <strong>60 Days</strong></li>
+          <li>✔ Total Return: <strong class="text-emerald-400">PKR 63,600</strong></li>
+        </ul>
+      </div>
+      <button onclick="subscribePackage('Package 4', 3180)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
+    </div>
+
+    <!-- Package 5 -->
+    <div class="bg-slate-800 border border-emerald-500/50 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition relative overflow-hidden">
+      <span class="absolute top-3 right-3 bg-emerald-500/20 text-emerald-400 text-xs px-2.5 py-1 rounded-full font-bold">VIP</span>
+      <div>
+        <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 5</h3>
+        <p class="text-3xl font-extrabold mb-4">PKR 6,180 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
+        <ul class="text-slate-300 space-y-2 mb-6 text-sm">
+          <li>✔ Daily Return: <strong>PKR 2,060</strong></li>
+          <li>✔ Duration: <strong>60 Days</strong></li>
+          <li>✔ Total Return: <strong class="text-emerald-400">PKR 123,600</strong></li>
+        </ul>
+      </div>
+      <button onclick="subscribePackage('Package 5', 6180)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
+    </div>
+
+  </section>
+
+  <script>
+    // Replace with your Supabase Project details
+    const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function subscribePackage(pkgName, amount) {
+      const userName = prompt(`Enter your Name/Phone number for ${pkgName} (Deposit: PKR ${amount}):`);
+      if (!userName) return;
+
+      const { data, error } = await _supabase
+        .from('user_investments')
+        .insert([{ user_name: userName, package_name: pkgName, amount_pkr: amount, status: 'Pending' }]);
+
+      if (error) {
+        alert("Error submitting request: " + error.message);
+      } else {
+        alert(`Success! Request for ${pkgName} (PKR ${amount}) submitted. Admin will verify shortly.`);
+      }
+    }
+  </script>
+</body>
+</html>
