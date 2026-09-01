@@ -127,4 +127,104 @@
 
   <script>
     const SUPABASE_URL = 'https://rrinvfjkvepclqesxaox.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyaW52ZmprdmVwY2xxZXN4YW94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNjg5MTMsImV4cCI6MjEwMzY0NDkxM30.5DRZBsF_k21AJE0SXf_p_gSSsR30FW0H-qm2
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyaW52ZmprdmVwY2xxZXN4YW94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNjg5MTMsImV4cCI6MjEwMzY0NDkxM30.5DRZBsF_k21AJE0SXf_p_gSSsR30FW0H-qm2aWQ4pb8';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentMode = 'login';
+    let currentUser = null;
+    let selectedPkg = { name: '', amount: 0, dailyProfit: 0 };
+
+    async function checkUser() {
+      const { data: { user } } = await _supabase.auth.getUser();
+      if (user) {
+        currentUser = user;
+        document.getElementById('auth-buttons').classList.add('hidden');
+        document.getElementById('user-info').classList.remove('hidden');
+        document.getElementById('user-email').innerText = user.email;
+      } else {
+        currentUser = null;
+        document.getElementById('auth-buttons').classList.remove('hidden');
+        document.getElementById('user-info').classList.add('hidden');
+      }
+    }
+    checkUser();
+
+    function subscribePackage(pkgName, amount, dailyProfit) {
+      if (!currentUser) { openModal('login'); return; }
+      selectedPkg = { name: pkgName, amount, dailyProfit };
+      document.getElementById('selected-package-info').innerText = `Selected: ${pkgName} (PKR ${amount})`;
+      document.getElementById('deposit-modal').classList.remove('hidden');
+    }
+
+    function closeDepositModal() { document.getElementById('deposit-modal').classList.add('hidden'); }
+
+    async function handleDepositSubmit(e) {
+      e.preventDefault();
+      const trxId = document.getElementById('trx-id-input').value.trim();
+      const fileInput = document.getElementById('screenshot-input');
+      const file = fileInput.files[0];
+      const submitBtn = document.getElementById('deposit-submit-btn');
+
+      if (!file) { alert('Please select a screenshot file'); return; }
+
+      submitBtn.innerText = "Submitting...";
+      submitBtn.disabled = true;
+
+      try {
+        // Upload File to Supabase Storage Bucket 'screenshots'
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+        
+        let screenshotUrl = '';
+        const { data: uploadData, error: uploadError } = await _supabase.storage
+          .from('screenshots')
+          .upload(fileName, file);
+
+        if (!uploadError) {
+          const { data: publicUrlData } = _supabase.storage.from('screenshots').getPublicUrl(fileName);
+          screenshotUrl = publicUrlData.publicUrl;
+        }
+
+        // Insert record into Database
+        const { error } = await _supabase.from('user_investments').insert([{ 
+          user_name: currentUser.email, 
+          package_name: selectedPkg.name, 
+          amount_pkr: Number(selectedPkg.amount), 
+          daily_profit: Number(selectedPkg.dailyProfit),
+          trx_id: trxId,
+          screenshot_url: screenshotUrl || file.name,
+          status: 'Pending' 
+        }]);
+
+        if (error) {
+          alert("Database Error: " + error.message);
+        } else {
+          alert("Deposit request submitted successfully!");
+          window.location.href = "history.html";
+        }
+      } catch (err) {
+        alert("Error: " + err.message);
+      } finally {
+        submitBtn.innerText = "Submit Deposit Request";
+        submitBtn.disabled = false;
+      }
+    }
+
+    function openModal(mode) { currentMode = mode; document.getElementById('auth-modal').classList.remove('hidden'); }
+    function closeModal() { document.getElementById('auth-modal').classList.add('hidden'); }
+    function toggleAuthMode() { currentMode = currentMode === 'login' ? 'register' : 'login'; }
+
+    async function handleAuth(e) {
+      e.preventDefault();
+      const email = document.getElementById('auth-email').value;
+      const password = document.getElementById('auth-password').value;
+      const fn = currentMode === 'register' ? _supabase.auth.signUp({ email, password }) : _supabase.auth.signInWithPassword({ email, password });
+      const { error } = await fn;
+      if (error) alert(error.message);
+      else { closeModal(); checkUser(); }
+    }
+
+    async function logout() { await _supabase.auth.signOut(); checkUser(); }
+  </script>
+</body>
+</html>
