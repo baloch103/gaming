@@ -9,7 +9,6 @@
 </head>
 <body class="bg-slate-900 text-white font-sans selection:bg-emerald-500 selection:text-slate-900">
 
-  <!-- Header -->
   <header class="p-5 bg-slate-800 border-b border-slate-700 flex justify-between items-center sticky top-0 z-40 shadow-lg">
     <h1 class="text-2xl font-bold text-emerald-400 tracking-wide">ProfitInvest PKR</h1>
     
@@ -24,10 +23,17 @@
     </div>
   </header>
 
-  <!-- User Dashboard Section -->
-  <section id="user-dashboard" class="hidden max-w-6xl mx-auto px-4 pt-8">
-    
-    <!-- Balance & Quick Actions Card -->
+  <div id="app-navigation" class="hidden max-w-6xl mx-auto px-4 mt-6">
+    <nav class="flex flex-wrap gap-2 border-b border-slate-700 pb-3">
+      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-tab text-emerald-400 border-emerald-500 border-b-2 font-bold px-4 py-2 text-sm transition">📊 Dashboard</button>
+      <button onclick="switchTab('deposit')" id="nav-deposit" class="nav-tab text-slate-400 hover:text-emerald-400 font-medium px-4 py-2 text-sm transition">📥 Packages & Deposit</button>
+      <button onclick="switchTab('withdraw')" id="nav-withdraw" class="nav-tab text-slate-400 hover:text-emerald-400 font-medium px-4 py-2 text-sm transition">💸 Withdraw Profit</button>
+      <button onclick="switchTab('investments')" id="nav-investments" class="nav-tab text-slate-400 hover:text-emerald-400 font-medium px-4 py-2 text-sm transition">📜 Investment History</button>
+      <button onclick="switchTab('withdrawals')" id="nav-withdrawals" class="nav-tab text-slate-400 hover:text-emerald-400 font-medium px-4 py-2 text-sm transition">💳 Withdrawal History</button>
+    </nav>
+  </div>
+
+  <section id="tab-dashboard" class="tab-content max-w-6xl mx-auto px-4 pt-6">
     <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8 flex flex-col md:flex-row justify-between items-center gap-4 shadow-xl">
       <div>
         <p class="text-xs text-slate-400 uppercase font-semibold">Total Approved Profit / Available Balance</p>
@@ -35,154 +41,91 @@
       </div>
       <div class="flex gap-3 w-full md:w-auto">
         <button onclick="loadUserData()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2.5 rounded-lg text-sm font-semibold transition">🔄 Refresh</button>
-        <button onclick="openWithdrawModal()" class="bg-emerald-500 hover:bg-emerald-600 px-5 py-2.5 rounded-lg text-sm font-bold transition flex items-center gap-2">
-          💸 Withdraw Profit
+        <button onclick="switchTab('withdraw')" class="bg-emerald-500 hover:bg-emerald-600 px-5 py-2.5 rounded-lg text-sm font-bold transition flex items-center gap-2">
+          💸 Go To Withdraw
         </button>
       </div>
     </div>
-
-    <!-- Active Investments Table -->
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8 shadow-xl">
-      <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
-        <h3 class="text-xl font-bold text-emerald-400">My Investment History</h3>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-slate-300">
-          <thead class="bg-slate-900 text-slate-400 uppercase text-xs">
-            <tr>
-              <th class="p-3">Package</th>
-              <th class="p-3">Amount</th>
-              <th class="p-3">Daily Profit</th>
-              <th class="p-3">Trx ID</th>
-              <th class="p-3">Next Profit In</th>
-              <th class="p-3">Status</th>
-            </tr>
-          </thead>
-          <tbody id="user-investments-list">
-            <tr>
-              <td colspan="6" class="p-4 text-center text-slate-500">Loading investments...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Withdrawal History Table -->
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8 shadow-xl">
-      <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
-        <h3 class="text-xl font-bold text-emerald-400">My Withdrawal History (ويٿڊرا رڪارڊ)</h3>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-slate-300">
-          <thead class="bg-slate-900 text-slate-400 uppercase text-xs">
-            <tr>
-              <th class="p-3">Amount</th>
-              <th class="p-3">Method</th>
-              <th class="p-3">Account Title</th>
-              <th class="p-3">Account No</th>
-              <th class="p-3">Date</th>
-              <th class="p-3">Status</th>
-            </tr>
-          </thead>
-          <tbody id="user-withdrawals-list">
-            <tr>
-              <td colspan="6" class="p-4 text-center text-slate-500">Loading withdrawals...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
   </section>
 
-  <!-- Hero Section -->
-  <section class="text-center py-12 px-4">
-    <h2 class="text-4xl font-extrabold mb-4">Secure & High Yield Investment Plans</h2>
-    <p class="text-slate-400 max-w-xl mx-auto mb-8">Create an account, select your package in PKR, and start earning daily returns guaranteed for 60 days.</p>
+  <section id="tab-deposit" class="tab-content max-w-6xl mx-auto px-4 pt-6 hidden">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-extrabold mb-2">Investment Plans</h2>
+      <p class="text-slate-400">Select your package in PKR and start earning daily returns.</p>
+    </div>
+
+    <div id="packages" class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-10">
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
+        <div>
+          <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 1</h3>
+          <p class="text-3xl font-extrabold mb-4">PKR 280 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
+          <ul class="text-slate-300 space-y-2 mb-6 text-sm">
+            <li>✔ Daily Return: <strong>PKR 93</strong></li>
+            <li>✔ Duration: <strong>60 Days</strong></li>
+            <li>✔ Total Return: <strong class="text-emerald-400">PKR 5,580</strong></li>
+          </ul>
+        </div>
+        <button onclick="subscribePackage('Package 1', 280, 93)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
+      </div>
+
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
+        <div>
+          <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 2</h3>
+          <p class="text-3xl font-extrabold mb-4">PKR 780 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
+          <ul class="text-slate-300 space-y-2 mb-6 text-sm">
+            <li>✔ Daily Return: <strong>PKR 260</strong></li>
+            <li>✔ Duration: <strong>60 Days</strong></li>
+            <li>✔ Total Return: <strong class="text-emerald-400">PKR 15,600</strong></li>
+          </ul>
+        </div>
+        <button onclick="subscribePackage('Package 2', 780, 260)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
+      </div>
+
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
+        <div>
+          <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 3</h3>
+          <p class="text-3xl font-extrabold mb-4">PKR 1,480 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
+          <ul class="text-slate-300 space-y-2 mb-6 text-sm">
+            <li>✔ Daily Return: <strong>PKR 493</strong></li>
+            <li>✔ Duration: <strong>60 Days</strong></li>
+            <li>✔ Total Return: <strong class="text-emerald-400">PKR 29,580</strong></li>
+          </ul>
+        </div>
+        <button onclick="subscribePackage('Package 3', 1480, 493)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
+      </div>
+
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
+        <div>
+          <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 4</h3>
+          <p class="text-3xl font-extrabold mb-4">PKR 3,180 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
+          <ul class="text-slate-300 space-y-2 mb-6 text-sm">
+            <li>✔ Daily Return: <strong>PKR 1,060</strong></li>
+            <li>✔ Duration: <strong>60 Days</strong></li>
+            <li>✔ Total Return: <strong class="text-emerald-400">PKR 63,600</strong></li>
+          </ul>
+        </div>
+        <button onclick="subscribePackage('Package 4', 3180, 1060)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
+      </div>
+
+      <div class="bg-slate-800 border border-emerald-500/50 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition relative overflow-hidden shadow-lg">
+        <span class="absolute top-3 right-3 bg-emerald-500/20 text-emerald-400 text-xs px-2.5 py-1 rounded-full font-bold">VIP</span>
+        <div>
+          <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 5</h3>
+          <p class="text-3xl font-extrabold mb-4">PKR 6,180 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
+          <ul class="text-slate-300 space-y-2 mb-6 text-sm">
+            <li>✔ Daily Return: <strong>PKR 2,060</strong></li>
+            <li>✔ Duration: <strong>60 Days</strong></li>
+            <li>✔ Total Return: <strong class="text-emerald-400">PKR 123,600</strong></li>
+          </ul>
+        </div>
+        <button onclick="subscribePackage('Package 5', 6180, 2060)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
+      </div>
+    </div>
   </section>
 
-  <!-- Packages Grid -->
-  <section id="packages" class="max-w-6xl mx-auto px-4 pb-20 grid grid-cols-1 md:grid-cols-3 gap-8">
-    
-    <!-- Package 1 -->
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
-      <div>
-        <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 1</h3>
-        <p class="text-3xl font-extrabold mb-4">PKR 280 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
-        <ul class="text-slate-300 space-y-2 mb-6 text-sm">
-          <li>✔ Daily Return: <strong>PKR 93</strong></li>
-          <li>✔ Duration: <strong>60 Days</strong></li>
-          <li>✔ Total Return: <strong class="text-emerald-400">PKR 5,580</strong></li>
-        </ul>
-      </div>
-      <button onclick="subscribePackage('Package 1', 280, 93)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
-    </div>
-
-    <!-- Package 2 -->
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
-      <div>
-        <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 2</h3>
-        <p class="text-3xl font-extrabold mb-4">PKR 780 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
-        <ul class="text-slate-300 space-y-2 mb-6 text-sm">
-          <li>✔ Daily Return: <strong>PKR 260</strong></li>
-          <li>✔ Duration: <strong>60 Days</strong></li>
-          <li>✔ Total Return: <strong class="text-emerald-400">PKR 15,600</strong></li>
-        </ul>
-      </div>
-      <button onclick="subscribePackage('Package 2', 780, 260)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
-    </div>
-
-    <!-- Package 3 -->
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
-      <div>
-        <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 3</h3>
-        <p class="text-3xl font-extrabold mb-4">PKR 1,480 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
-        <ul class="text-slate-300 space-y-2 mb-6 text-sm">
-          <li>✔ Daily Return: <strong>PKR 493</strong></li>
-          <li>✔ Duration: <strong>60 Days</strong></li>
-          <li>✔ Total Return: <strong class="text-emerald-400">PKR 29,580</strong></li>
-        </ul>
-      </div>
-      <button onclick="subscribePackage('Package 3', 1480, 493)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
-    </div>
-
-    <!-- Package 4 -->
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
-      <div>
-        <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 4</h3>
-        <p class="text-3xl font-extrabold mb-4">PKR 3,180 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
-        <ul class="text-slate-300 space-y-2 mb-6 text-sm">
-          <li>✔ Daily Return: <strong>PKR 1,060</strong></li>
-          <li>✔ Duration: <strong>60 Days</strong></li>
-          <li>✔ Total Return: <strong class="text-emerald-400">PKR 63,600</strong></li>
-        </ul>
-      </div>
-      <button onclick="subscribePackage('Package 4', 3180, 1060)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
-    </div>
-
-    <!-- Package 5 -->
-    <div class="bg-slate-800 border border-emerald-500/50 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition relative overflow-hidden shadow-lg">
-      <span class="absolute top-3 right-3 bg-emerald-500/20 text-emerald-400 text-xs px-2.5 py-1 rounded-full font-bold">VIP</span>
-      <div>
-        <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 5</h3>
-        <p class="text-3xl font-extrabold mb-4">PKR 6,180 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
-        <ul class="text-slate-300 space-y-2 mb-6 text-sm">
-          <li>✔ Daily Return: <strong>PKR 2,060</strong></li>
-          <li>✔ Duration: <strong>60 Days</strong></li>
-          <li>✔ Total Return: <strong class="text-emerald-400">PKR 123,600</strong></li>
-        </ul>
-      </div>
-      <button onclick="subscribePackage('Package 5', 6180, 2060)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
-    </div>
-
-  </section>
-
-  <!-- Withdraw Modal -->
-  <div id="withdraw-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-    <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl w-full max-w-md relative shadow-2xl">
-      <button onclick="closeWithdrawModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
-      
-      <h3 class="text-2xl font-bold text-emerald-400 mb-4">Request Withdrawal</h3>
+  <section id="tab-withdraw" class="tab-content max-w-xl mx-auto px-4 pt-6 hidden">
+    <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-2xl">
+      <h3 class="text-2xl font-bold text-emerald-400 mb-4 border-b border-slate-700 pb-2">Request Withdrawal (رقم ڪڍڻ)</h3>
       
       <form onsubmit="handleWithdrawSubmit(event)" class="space-y-4">
         <div>
@@ -208,9 +151,67 @@
         <button type="submit" id="withdraw-submit-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Submit Withdrawal Request</button>
       </form>
     </div>
-  </div>
+  </section>
 
-  <!-- Deposit Payment Modal -->
+  <section id="tab-investments" class="tab-content max-w-6xl mx-auto px-4 pt-6 hidden">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8 shadow-xl">
+      <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
+        <h3 class="text-xl font-bold text-emerald-400">My Investment History</h3>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-900 text-slate-400 uppercase text-xs">
+            <tr>
+              <th class="p-3">Package</th>
+              <th class="p-3">Amount</th>
+              <th class="p-3">Daily Profit</th>
+              <th class="p-3">Trx ID</th>
+              <th class="p-3">Next Profit In</th>
+              <th class="p-3">Status</th>
+            </tr>
+          </thead>
+          <tbody id="user-investments-list">
+            <tr>
+              <td colspan="6" class="p-4 text-center text-slate-500">Loading investments...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-withdrawals" class="tab-content max-w-6xl mx-auto px-4 pt-6 hidden">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8 shadow-xl">
+      <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
+        <h3 class="text-xl font-bold text-emerald-400">My Withdrawal History (ويٿڊرا رڪارڊ)</h3>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-900 text-slate-400 uppercase text-xs">
+            <tr>
+              <th class="p-3">Amount</th>
+              <th class="p-3">Method</th>
+              <th class="p-3">Account Title</th>
+              <th class="p-3">Account No</th>
+              <th class="p-3">Date</th>
+              <th class="p-3">Status</th>
+            </tr>
+          </thead>
+          <tbody id="user-withdrawals-list">
+            <tr>
+              <td colspan="6" class="p-4 text-center text-slate-500">Loading withdrawals...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="public-hero" class="text-center py-12 px-4">
+    <h2 class="text-4xl font-extrabold mb-4">Secure & High Yield Investment Plans</h2>
+    <p class="text-slate-400 max-w-xl mx-auto mb-8">Create an account, select your package in PKR, and start earning daily returns guaranteed for 60 days.</p>
+  </section>
+
   <div id="deposit-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
     <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl w-full max-w-md relative shadow-2xl">
       <button onclick="closeDepositModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
@@ -223,11 +224,11 @@
         <p class="text-sm font-bold text-white mb-2">JazzCash</p>
         
         <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Account Title</p>
-        <p class="text-sm font-bold text-white mb-3">ProfitInvest Business</p>
+        <p class="text-sm font-bold text-white mb-3">Hasnain Communication</p>
         
         <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Account Number</p>
         <div class="flex items-center justify-between bg-slate-800 border border-slate-700 rounded-lg p-2">
-          <span id="accNumber" class="font-mono text-emerald-400 font-bold text-base">030000009</span>
+          <span id="accNumber" class="font-mono text-emerald-400 font-bold text-base">03363152236</span>
           <button onclick="copyAccountNo()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition">Copy</button>
         </div>
       </div>
@@ -246,7 +247,6 @@
     </div>
   </div>
 
-  <!-- Auth Modal -->
   <div id="auth-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
     <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl w-full max-w-md relative shadow-2xl">
       <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
@@ -281,6 +281,23 @@
     let selectedPkg = { name: '', amount: 0, dailyProfit: 0 };
     let countdownIntervals = [];
 
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-tab').forEach(el => {
+        el.classList.remove('text-emerald-400', 'border-emerald-500', 'border-b-2', 'font-bold');
+        el.classList.add('text-slate-400', 'font-medium');
+      });
+
+      const activeSection = document.getElementById('tab-' + tabId);
+      const activeNav = document.getElementById('nav-' + tabId);
+
+      if (activeSection) activeSection.classList.remove('hidden');
+      if (activeNav) {
+        activeNav.classList.remove('text-slate-400', 'font-medium');
+        activeNav.classList.add('text-emerald-400', 'border-emerald-500', 'border-b-2', 'font-bold');
+      }
+    }
+
     async function checkUser() {
       const { data: { user } } = await _supabase.auth.getUser();
       if (user) {
@@ -288,13 +305,20 @@
         document.getElementById('auth-buttons').classList.add('hidden');
         document.getElementById('user-info').classList.remove('hidden');
         document.getElementById('user-email').innerText = user.email;
-        document.getElementById('user-dashboard').classList.remove('hidden');
+        
+        document.getElementById('app-navigation').classList.remove('hidden');
+        document.getElementById('public-hero').classList.add('hidden');
+        
+        switchTab('dashboard');
         loadUserData();
       } else {
         currentUser = null;
         document.getElementById('auth-buttons').classList.remove('hidden');
         document.getElementById('user-info').classList.add('hidden');
-        document.getElementById('user-dashboard').classList.add('hidden');
+        
+        document.getElementById('app-navigation').classList.add('hidden');
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        document.getElementById('public-hero').classList.remove('hidden');
       }
     }
     checkUser();
@@ -340,11 +364,9 @@
         
         if (item.status === 'Approved') {
           statusColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
-          
-          // Accurate profit calculation per day passed
           const createdTime = new Date(item.created_at).getTime();
           const daysPassed = Math.floor((now - createdTime) / (1000 * 60 * 60 * 24));
-          const earnedDays = Math.min(Math.max(daysPassed, 1), 60); // Cap at 60 days
+          const earnedDays = Math.min(Math.max(daysPassed, 1), 60);
           calculatedBalance += Number(item.daily_profit || 0) * earnedDays;
         }
         
@@ -457,19 +479,6 @@
       countdownIntervals.push(interval);
     }
 
-    function openWithdrawModal() {
-      if (!currentUser) {
-        alert("Please Login first!");
-        openModal('login');
-        return;
-      }
-      document.getElementById('withdraw-modal').classList.remove('hidden');
-    }
-
-    function closeWithdrawModal() {
-      document.getElementById('withdraw-modal').classList.add('hidden');
-    }
-
     async function handleWithdrawSubmit(e) {
       e.preventDefault();
       const method = document.getElementById('withdraw-method').value;
@@ -502,7 +511,10 @@
           alert("Error submitting withdrawal: " + error.message);
         } else {
           alert(`Withdrawal request for PKR ${amount} submitted successfully!`);
-          closeWithdrawModal();
+          document.getElementById('withdraw-title').value = '';
+          document.getElementById('withdraw-number').value = '';
+          document.getElementById('withdraw-amount').value = '';
+          switchTab('withdrawals');
           loadUserWithdrawals();
         }
       } catch (err) {
@@ -623,6 +635,7 @@
         } else {
           alert(`Success! Deposit request for ${selectedPkg.name} submitted.`);
           closeDepositModal();
+          switchTab('investments');
           loadUserData();
         }
       } catch (err) {
