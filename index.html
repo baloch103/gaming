@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Investment Plans Platform - PKR</title>
+  <title>ProfitInvest PKR - Home</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-900 text-white font-sans selection:bg-emerald-500 selection:text-slate-900">
 
   <header class="p-5 bg-slate-800 border-b border-slate-700 flex justify-between items-center sticky top-0 z-40 shadow-lg">
-    <h1 class="text-2xl font-bold text-emerald-400 tracking-wide">ProfitInvest PKR</h1>
+    <h1 class="text-2xl font-bold text-emerald-400">ProfitInvest PKR</h1>
     
     <div id="auth-buttons" class="space-x-2">
       <button onclick="openModal('login')" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg text-sm font-medium transition">Login</button>
@@ -18,229 +18,77 @@
     </div>
 
     <div id="user-info" class="hidden flex items-center space-x-4">
+      <a href="dashboard.html" class="bg-emerald-500 hover:bg-emerald-600 px-3 py-1.5 rounded-lg text-xs font-bold transition">My Dashboard</a>
       <span id="user-email" class="text-emerald-400 text-sm font-semibold"></span>
       <button onclick="logout()" class="bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-lg text-xs font-medium transition">Logout</button>
     </div>
   </header>
 
-  <div id="app-navigation" class="hidden max-w-6xl mx-auto px-4 mt-6">
-    <nav class="flex flex-wrap gap-2 border-b border-slate-700 pb-3">
-      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-tab text-emerald-400 border-emerald-500 border-b-2 font-bold px-4 py-2 text-sm transition">📊 Dashboard</button>
-      <button onclick="switchTab('deposit')" id="nav-deposit" class="nav-tab text-slate-400 hover:text-emerald-400 font-medium px-4 py-2 text-sm transition">📥 Packages & Deposit</button>
-      <button onclick="switchTab('withdraw')" id="nav-withdraw" class="nav-tab text-slate-400 hover:text-emerald-400 font-medium px-4 py-2 text-sm transition">💸 Withdraw Profit</button>
-      <button onclick="switchTab('investments')" id="nav-investments" class="nav-tab text-slate-400 hover:text-emerald-400 font-medium px-4 py-2 text-sm transition">📜 Investment History</button>
-      <button onclick="switchTab('withdrawals')" id="nav-withdrawals" class="nav-tab text-slate-400 hover:text-emerald-400 font-medium px-4 py-2 text-sm transition">💳 Withdrawal History</button>
-    </nav>
-  </div>
-
-  <section id="tab-dashboard" class="tab-content max-w-6xl mx-auto px-4 pt-6">
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8 flex flex-col md:flex-row justify-between items-center gap-4 shadow-xl">
-      <div>
-        <p class="text-xs text-slate-400 uppercase font-semibold">Total Approved Profit / Available Balance</p>
-        <h3 id="user-balance" class="text-3xl font-extrabold text-emerald-400 mt-1">PKR 0</h3>
-      </div>
-      <div class="flex gap-3 w-full md:w-auto">
-        <button onclick="loadUserData()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2.5 rounded-lg text-sm font-semibold transition">🔄 Refresh</button>
-        <button onclick="switchTab('withdraw')" class="bg-emerald-500 hover:bg-emerald-600 px-5 py-2.5 rounded-lg text-sm font-bold transition flex items-center gap-2">
-          💸 Go To Withdraw
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <section id="tab-deposit" class="tab-content max-w-6xl mx-auto px-4 pt-6 hidden">
-    <div class="text-center mb-8">
-      <h2 class="text-3xl font-extrabold mb-2">Investment Plans</h2>
-      <p class="text-slate-400">Select your package in PKR and start earning daily returns.</p>
-    </div>
-
-    <div id="packages" class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-10">
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
-        <div>
-          <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 1</h3>
-          <p class="text-3xl font-extrabold mb-4">PKR 280 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
-          <ul class="text-slate-300 space-y-2 mb-6 text-sm">
-            <li>✔ Daily Return: <strong>PKR 93</strong></li>
-            <li>✔ Duration: <strong>60 Days</strong></li>
-            <li>✔ Total Return: <strong class="text-emerald-400">PKR 5,580</strong></li>
-          </ul>
-        </div>
-        <button onclick="subscribePackage('Package 1', 280, 93)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
-      </div>
-
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
-        <div>
-          <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 2</h3>
-          <p class="text-3xl font-extrabold mb-4">PKR 780 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
-          <ul class="text-slate-300 space-y-2 mb-6 text-sm">
-            <li>✔ Daily Return: <strong>PKR 260</strong></li>
-            <li>✔ Duration: <strong>60 Days</strong></li>
-            <li>✔ Total Return: <strong class="text-emerald-400">PKR 15,600</strong></li>
-          </ul>
-        </div>
-        <button onclick="subscribePackage('Package 2', 780, 260)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
-      </div>
-
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
-        <div>
-          <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 3</h3>
-          <p class="text-3xl font-extrabold mb-4">PKR 1,480 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
-          <ul class="text-slate-300 space-y-2 mb-6 text-sm">
-            <li>✔ Daily Return: <strong>PKR 493</strong></li>
-            <li>✔ Duration: <strong>60 Days</strong></li>
-            <li>✔ Total Return: <strong class="text-emerald-400">PKR 29,580</strong></li>
-          </ul>
-        </div>
-        <button onclick="subscribePackage('Package 3', 1480, 493)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
-      </div>
-
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
-        <div>
-          <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 4</h3>
-          <p class="text-3xl font-extrabold mb-4">PKR 3,180 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
-          <ul class="text-slate-300 space-y-2 mb-6 text-sm">
-            <li>✔ Daily Return: <strong>PKR 1,060</strong></li>
-            <li>✔ Duration: <strong>60 Days</strong></li>
-            <li>✔ Total Return: <strong class="text-emerald-400">PKR 63,600</strong></li>
-          </ul>
-        </div>
-        <button onclick="subscribePackage('Package 4', 3180, 1060)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
-      </div>
-
-      <div class="bg-slate-800 border border-emerald-500/50 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition relative overflow-hidden shadow-lg">
-        <span class="absolute top-3 right-3 bg-emerald-500/20 text-emerald-400 text-xs px-2.5 py-1 rounded-full font-bold">VIP</span>
-        <div>
-          <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 5</h3>
-          <p class="text-3xl font-extrabold mb-4">PKR 6,180 <span class="text-sm font-normal text-slate-400">Deposit</span></p>
-          <ul class="text-slate-300 space-y-2 mb-6 text-sm">
-            <li>✔ Daily Return: <strong>PKR 2,060</strong></li>
-            <li>✔ Duration: <strong>60 Days</strong></li>
-            <li>✔ Total Return: <strong class="text-emerald-400">PKR 123,600</strong></li>
-          </ul>
-        </div>
-        <button onclick="subscribePackage('Package 5', 6180, 2060)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
-      </div>
-    </div>
-  </section>
-
-  <section id="tab-withdraw" class="tab-content max-w-xl mx-auto px-4 pt-6 hidden">
-    <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-2xl">
-      <h3 class="text-2xl font-bold text-emerald-400 mb-4 border-b border-slate-700 pb-2">Request Withdrawal (رقم ڪڍڻ)</h3>
-      
-      <form onsubmit="handleWithdrawSubmit(event)" class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium mb-1 text-slate-300">Payment Gateway</label>
-          <select id="withdraw-method" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
-            <option value="Easypaisa">Easypaisa</option>
-            <option value="JazzCash">JazzCash</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-1 text-slate-300">Account Title (نالو)</label>
-          <input type="text" id="withdraw-title" required placeholder="e.g. Ali Raza" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-1 text-slate-300">Account Number (نمبر)</label>
-          <input type="text" id="withdraw-number" required placeholder="e.g. 03001234567" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-1 text-slate-300">Withdraw Amount (PKR)</label>
-          <input type="number" id="withdraw-amount" min="100" required placeholder="Min 100 PKR" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
-        </div>
-        
-        <button type="submit" id="withdraw-submit-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Submit Withdrawal Request</button>
-      </form>
-    </div>
-  </section>
-
-  <section id="tab-investments" class="tab-content max-w-6xl mx-auto px-4 pt-6 hidden">
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8 shadow-xl">
-      <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
-        <h3 class="text-xl font-bold text-emerald-400">My Investment History</h3>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-slate-300">
-          <thead class="bg-slate-900 text-slate-400 uppercase text-xs">
-            <tr>
-              <th class="p-3">Package</th>
-              <th class="p-3">Amount</th>
-              <th class="p-3">Daily Profit</th>
-              <th class="p-3">Trx ID</th>
-              <th class="p-3">Next Profit In</th>
-              <th class="p-3">Status</th>
-            </tr>
-          </thead>
-          <tbody id="user-investments-list">
-            <tr>
-              <td colspan="6" class="p-4 text-center text-slate-500">Loading investments...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <section id="tab-withdrawals" class="tab-content max-w-6xl mx-auto px-4 pt-6 hidden">
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8 shadow-xl">
-      <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
-        <h3 class="text-xl font-bold text-emerald-400">My Withdrawal History (ويٿڊرا رڪارڊ)</h3>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-slate-300">
-          <thead class="bg-slate-900 text-slate-400 uppercase text-xs">
-            <tr>
-              <th class="p-3">Amount</th>
-              <th class="p-3">Method</th>
-              <th class="p-3">Account Title</th>
-              <th class="p-3">Account No</th>
-              <th class="p-3">Date</th>
-              <th class="p-3">Status</th>
-            </tr>
-          </thead>
-          <tbody id="user-withdrawals-list">
-            <tr>
-              <td colspan="6" class="p-4 text-center text-slate-500">Loading withdrawals...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <section id="public-hero" class="text-center py-12 px-4">
+  <section class="text-center py-10 px-4">
     <h2 class="text-4xl font-extrabold mb-4">Secure & High Yield Investment Plans</h2>
-    <p class="text-slate-400 max-w-xl mx-auto mb-8">Create an account, select your package in PKR, and start earning daily returns guaranteed for 60 days.</p>
+    <p class="text-slate-400 max-w-xl mx-auto">Select your package in PKR and start earning daily returns guaranteed for 60 days.</p>
+  </section>
+
+  <section class="max-w-6xl mx-auto px-4 pb-20 grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
+      <div>
+        <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 1</h3>
+        <p class="text-3xl font-extrabold mb-4">PKR 280</p>
+        <ul class="text-slate-300 space-y-2 mb-6 text-sm">
+          <li>✔ Daily Return: <strong>PKR 93</strong></li>
+          <li>✔ Duration: <strong>60 Days</strong></li>
+          <li>✔ Total Return: <strong class="text-emerald-400">PKR 5,580</strong></li>
+        </ul>
+      </div>
+      <button onclick="subscribePackage('Package 1', 280, 93)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
+    </div>
+
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
+      <div>
+        <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 2</h3>
+        <p class="text-3xl font-extrabold mb-4">PKR 780</p>
+        <ul class="text-slate-300 space-y-2 mb-6 text-sm">
+          <li>✔ Daily Return: <strong>PKR 260</strong></li>
+          <li>✔ Duration: <strong>60 Days</strong></li>
+          <li>✔ Total Return: <strong class="text-emerald-400">PKR 15,600</strong></li>
+        </ul>
+      </div>
+      <button onclick="subscribePackage('Package 2', 780, 260)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
+    </div>
+
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-lg">
+      <div>
+        <h3 class="text-xl font-bold text-emerald-400 mb-2">Package 3</h3>
+        <p class="text-3xl font-extrabold mb-4">PKR 1,480</p>
+        <ul class="text-slate-300 space-y-2 mb-6 text-sm">
+          <li>✔ Daily Return: <strong>PKR 493</strong></li>
+          <li>✔ Duration: <strong>60 Days</strong></li>
+          <li>✔ Total Return: <strong class="text-emerald-400">PKR 29,580</strong></li>
+        </ul>
+      </div>
+      <button onclick="subscribePackage('Package 3', 1480, 493)" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Invest Now</button>
+    </div>
   </section>
 
   <div id="deposit-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
     <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl w-full max-w-md relative shadow-2xl">
       <button onclick="closeDepositModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
-      
       <h3 class="text-2xl font-bold text-emerald-400 mb-2">Deposit Payment</h3>
       <p id="selected-package-info" class="text-sm font-semibold text-slate-300 mb-4"></p>
 
       <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 mb-4 text-left">
-        <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Payment Method</p>
-        <p class="text-sm font-bold text-white mb-2">JazzCash</p>
-        
-        <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Account Title</p>
-        <p class="text-sm font-bold text-white mb-3">Hasnain Communication</p>
-        
-        <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Account Number</p>
-        <div class="flex items-center justify-between bg-slate-800 border border-slate-700 rounded-lg p-2">
-          <span id="accNumber" class="font-mono text-emerald-400 font-bold text-base">03363152236</span>
-          <button onclick="copyAccountNo()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition">Copy</button>
+        <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Payment Method: JazzCash</p>
+        <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Account Title: Hasnain Communication</p>
+        <div class="flex items-center justify-between bg-slate-800 border border-slate-700 rounded-lg p-2 mt-2">
+          <span id="accNumber" class="font-mono text-emerald-400 font-bold">03363152236</span>
+          <button onclick="navigator.clipboard.writeText('03363152236'); alert('Copied!');" class="bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-md font-semibold">Copy</button>
         </div>
       </div>
 
-      <p class="text-xs text-slate-400 mb-4 text-left leading-relaxed">
-        💡 Send the exact deposit amount to the account above, paste your <strong>Transaction ID (Trx ID)</strong> below, and click Submit.
-      </p>
-
       <form onsubmit="handleDepositSubmit(event)" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium mb-1 text-slate-300 text-left">Transaction ID (Trx ID)</label>
-          <input type="text" id="trx-id-input" required placeholder="e.g. 98234712093" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
+          <label class="block text-sm font-medium mb-1 text-slate-300">Transaction ID (Trx ID)</label>
+          <input type="text" id="trx-id-input" required placeholder="e.g. 98234712093" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white">
         </div>
         <button type="submit" id="deposit-submit-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Submit Deposit Request</button>
       </form>
@@ -255,11 +103,11 @@
       <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
         <div>
           <label class="block text-sm font-medium mb-1 text-slate-300">Email Address</label>
-          <input type="email" id="auth-email" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
+          <input type="email" id="auth-email" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white">
         </div>
         <div>
           <label class="block text-sm font-medium mb-1 text-slate-300">Password</label>
-          <input type="password" id="auth-password" required minlength="6" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
+          <input type="password" id="auth-password" required minlength="6" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white">
         </div>
         <button type="submit" id="auth-submit-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Submit</button>
       </form>
@@ -279,24 +127,6 @@
     let currentMode = 'login';
     let currentUser = null;
     let selectedPkg = { name: '', amount: 0, dailyProfit: 0 };
-    let countdownIntervals = [];
-
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.nav-tab').forEach(el => {
-        el.classList.remove('text-emerald-400', 'border-emerald-500', 'border-b-2', 'font-bold');
-        el.classList.add('text-slate-400', 'font-medium');
-      });
-
-      const activeSection = document.getElementById('tab-' + tabId);
-      const activeNav = document.getElementById('nav-' + tabId);
-
-      if (activeSection) activeSection.classList.remove('hidden');
-      if (activeNav) {
-        activeNav.classList.remove('text-slate-400', 'font-medium');
-        activeNav.classList.add('text-emerald-400', 'border-emerald-500', 'border-b-2', 'font-bold');
-      }
-    }
 
     async function checkUser() {
       const { data: { user } } = await _supabase.auth.getUser();
@@ -305,346 +135,49 @@
         document.getElementById('auth-buttons').classList.add('hidden');
         document.getElementById('user-info').classList.remove('hidden');
         document.getElementById('user-email').innerText = user.email;
-        
-        document.getElementById('app-navigation').classList.remove('hidden');
-        document.getElementById('public-hero').classList.add('hidden');
-        
-        switchTab('dashboard');
-        loadUserData();
       } else {
         currentUser = null;
         document.getElementById('auth-buttons').classList.remove('hidden');
         document.getElementById('user-info').classList.add('hidden');
-        
-        document.getElementById('app-navigation').classList.add('hidden');
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-        document.getElementById('public-hero').classList.remove('hidden');
       }
     }
     checkUser();
 
-    function clearAllIntervals() {
-      countdownIntervals.forEach(clearInterval);
-      countdownIntervals = [];
+    function subscribePackage(pkgName, amount, dailyProfit) {
+      if (!currentUser) { openModal('login'); return; }
+      selectedPkg = { name: pkgName, amount, dailyProfit };
+      document.getElementById('selected-package-info').innerText = `Selected: ${pkgName} (PKR ${amount})`;
+      document.getElementById('deposit-modal').classList.remove('hidden');
     }
 
-    async function loadUserData() {
-      if (!currentUser) return;
-      loadUserInvestments();
-      loadUserWithdrawals();
-    }
+    function closeDepositModal() { document.getElementById('deposit-modal').classList.add('hidden'); }
 
-    async function loadUserInvestments() {
-      clearAllIntervals();
-      const listContainer = document.getElementById('user-investments-list');
-      listContainer.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Loading investments...</td></tr>';
-
-      const { data, error } = await _supabase
-        .from('user_investments')
-        .select('*')
-        .eq('user_name', currentUser.email)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        listContainer.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-400">Error loading investments: ${error.message}</td></tr>`;
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        listContainer.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">No investment history found.</td></tr>';
-        document.getElementById('user-balance').innerText = `PKR 0`;
-        return;
-      }
-
-      let calculatedBalance = 0;
-      const now = new Date().getTime();
-
-      listContainer.innerHTML = data.map((item, index) => {
-        let statusColor = 'text-amber-400 bg-amber-500/10 border-amber-500/30';
-        
-        if (item.status === 'Approved') {
-          statusColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
-          const createdTime = new Date(item.created_at).getTime();
-          const daysPassed = Math.floor((now - createdTime) / (1000 * 60 * 60 * 24));
-          const earnedDays = Math.min(Math.max(daysPassed, 1), 60);
-          calculatedBalance += Number(item.daily_profit || 0) * earnedDays;
-        }
-        
-        if (item.status === 'Rejected') statusColor = 'text-rose-400 bg-rose-500/10 border-rose-500/30';
-
-        const timerId = `timer-${index}`;
-
-        return `
-          <tr class="border-b border-slate-700/50 hover:bg-slate-800/50">
-            <td class="p-3 font-semibold text-emerald-400">${item.package_name || 'N/A'}</td>
-            <td class="p-3 font-bold">PKR ${item.amount_pkr || 0}</td>
-            <td class="p-3 text-emerald-300 font-semibold">+PKR ${item.daily_profit || 0}/day</td>
-            <td class="p-3 font-mono text-xs text-slate-300">${item.trx_id || 'N/A'}</td>
-            <td class="p-3 font-mono text-xs text-amber-400 font-bold" id="${timerId}">Calculating...</td>
-            <td class="p-3">
-              <span class="px-2.5 py-1 text-xs rounded-full border ${statusColor} font-semibold">
-                ${item.status || 'Pending'}
-              </span>
-            </td>
-          </tr>
-        `;
-      }).join('');
-
-      document.getElementById('user-balance').innerText = `PKR ${calculatedBalance.toLocaleString()}`;
-
-      data.forEach((item, index) => {
-        startCountdown(`timer-${index}`, item.created_at, item.status);
-      });
-    }
-
-    async function loadUserWithdrawals() {
-      const listContainer = document.getElementById('user-withdrawals-list');
-      listContainer.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Loading withdrawals...</td></tr>';
-
-      const { data, error } = await _supabase
-        .from('user_withdrawals')
-        .select('*')
-        .eq('user_name', currentUser.email)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        listContainer.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-400">Error fetching withdrawals: ${error.message}</td></tr>`;
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        listContainer.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">No withdrawal requests found.</td></tr>';
-        return;
-      }
-
-      listContainer.innerHTML = data.map(item => {
-        let statusColor = 'text-amber-400 bg-amber-500/10 border-amber-500/30';
-        if (item.status === 'Approved') statusColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
-        if (item.status === 'Rejected') statusColor = 'text-rose-400 bg-rose-500/10 border-rose-500/30';
-
-        const dateStr = item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A';
-
-        return `
-          <tr class="border-b border-slate-700/50 hover:bg-slate-800/50">
-            <td class="p-3 font-bold text-emerald-400">PKR ${item.amount_pkr || 0}</td>
-            <td class="p-3 text-xs font-semibold">${item.payment_method || 'N/A'}</td>
-            <td class="p-3 text-xs text-slate-300">${item.account_title || 'N/A'}</td>
-            <td class="p-3 font-mono text-xs text-slate-300">${item.account_number || 'N/A'}</td>
-            <td class="p-3 text-xs text-slate-400">${dateStr}</td>
-            <td class="p-3">
-              <span class="px-2.5 py-1 text-xs rounded-full border ${statusColor} font-semibold">
-                ${item.status || 'Pending'}
-              </span>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function startCountdown(elementId, createdAt, status) {
-      const element = document.getElementById(elementId);
-      if (!element) return;
-
-      if (status === 'Pending') {
-        element.innerHTML = '<span class="text-slate-500 font-normal">Awaiting Approval</span>';
-        return;
-      }
-
-      if (status === 'Rejected') {
-        element.innerHTML = '<span class="text-rose-500 font-normal">Rejected</span>';
-        return;
-      }
-
-      const createdTime = new Date(createdAt).getTime();
-
-      const timerFunc = () => {
-        const now = new Date().getTime();
-        const elapsed = now - createdTime;
-        const dayInMs = 24 * 60 * 60 * 1000;
-        const remaining = dayInMs - (elapsed % dayInMs);
-
-        const hours = Math.floor(remaining / (1000 * 60 * 60));
-        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
-
-        const formattedH = String(hours).padStart(2, '0');
-        const formattedM = String(minutes).padStart(2, '0');
-        const formattedS = String(seconds).padStart(2, '0');
-
-        element.innerHTML = `⏱️ ${formattedH}:${formattedM}:${formattedS}`;
-      };
-
-      timerFunc();
-      const interval = setInterval(timerFunc, 1000);
-      countdownIntervals.push(interval);
-    }
-
-    async function handleWithdrawSubmit(e) {
+    async function handleDepositSubmit(e) {
       e.preventDefault();
-      const method = document.getElementById('withdraw-method').value;
-      const title = document.getElementById('withdraw-title').value.trim();
-      const number = document.getElementById('withdraw-number').value.trim();
-      const amount = document.getElementById('withdraw-amount').value;
-      const submitBtn = document.getElementById('withdraw-submit-btn');
-
-      if (!title || !number || !amount) {
-        alert("Please fill all details.");
-        return;
-      }
-
-      submitBtn.innerText = "Submitting Request...";
-      submitBtn.disabled = true;
-
-      try {
-        const { data, error } = await _supabase
-          .from('user_withdrawals')
-          .insert([{
-            user_name: currentUser.email,
-            payment_method: method,
-            account_title: title,
-            account_number: number,
-            amount_pkr: Number(amount),
-            status: 'Pending'
-          }]);
-
-        if (error) {
-          alert("Error submitting withdrawal: " + error.message);
-        } else {
-          alert(`Withdrawal request for PKR ${amount} submitted successfully!`);
-          document.getElementById('withdraw-title').value = '';
-          document.getElementById('withdraw-number').value = '';
-          document.getElementById('withdraw-amount').value = '';
-          switchTab('withdrawals');
-          loadUserWithdrawals();
-        }
-      } catch (err) {
-        alert("Unexpected error: " + err.message);
-      } finally {
-        submitBtn.innerText = "Submit Withdrawal Request";
-        submitBtn.disabled = false;
-      }
+      const trxId = document.getElementById('trx-id-input').value.trim();
+      const { error } = await _supabase.from('user_investments').insert([{ 
+        user_name: currentUser.email, package_name: selectedPkg.name, 
+        amount_pkr: Number(selectedPkg.amount), daily_profit: Number(selectedPkg.dailyProfit),
+        trx_id: trxId, status: 'Pending' 
+      }]);
+      if (!error) { alert("Deposit request submitted!"); window.location.href = "history.html"; }
     }
 
-    function openModal(mode) {
-      currentMode = mode;
-      updateModalUI();
-      document.getElementById('auth-modal').classList.remove('hidden');
-    }
-
-    function closeModal() {
-      document.getElementById('auth-modal').classList.add('hidden');
-    }
-
-    function toggleAuthMode() {
-      currentMode = currentMode === 'login' ? 'register' : 'login';
-      updateModalUI();
-    }
-
-    function updateModalUI() {
-      const isLogin = currentMode === 'login';
-      document.getElementById('modal-title').innerText = isLogin ? 'Login to Account' : 'Create New Account';
-      document.getElementById('auth-submit-btn').innerText = isLogin ? 'Login' : 'Register Account';
-      document.getElementById('modal-toggle-text').innerText = isLogin ? "Don't have an account?" : "Already have an account?";
-      document.getElementById('modal-toggle-btn').innerText = isLogin ? 'Register here' : 'Login here';
-    }
+    function openModal(mode) { currentMode = mode; document.getElementById('auth-modal').classList.remove('hidden'); }
+    function closeModal() { document.getElementById('auth-modal').classList.add('hidden'); }
+    function toggleAuthMode() { currentMode = currentMode === 'login' ? 'register' : 'login'; }
 
     async function handleAuth(e) {
       e.preventDefault();
       const email = document.getElementById('auth-email').value;
       const password = document.getElementById('auth-password').value;
-
-      if (currentMode === 'register') {
-        const { data, error } = await _supabase.auth.signUp({ email, password });
-        if (error) {
-          alert("Registration Error: " + error.message);
-        } else {
-          alert("Account created successfully! You are now logged in.");
-          closeModal();
-          checkUser();
-        }
-      } else {
-        const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-        if (error) {
-          alert("Login Error: " + error.message);
-        } else {
-          alert("Logged in successfully!");
-          closeModal();
-          checkUser();
-        }
-      }
+      const fn = currentMode === 'register' ? _supabase.auth.signUp({ email, password }) : _supabase.auth.signInWithPassword({ email, password });
+      const { error } = await fn;
+      if (error) alert(error.message);
+      else { closeModal(); checkUser(); }
     }
 
-    async function logout() {
-      await _supabase.auth.signOut();
-      checkUser();
-    }
-
-    function subscribePackage(pkgName, amount, dailyProfit) {
-      if (!currentUser) {
-        alert("Please Login or Register an account first to invest!");
-        openModal('login');
-        return;
-      }
-
-      selectedPkg = { name: pkgName, amount: amount, dailyProfit: dailyProfit };
-      document.getElementById('selected-package-info').innerText = `Selected: ${pkgName} (PKR ${amount}) - Profit: PKR ${dailyProfit}/day`;
-      document.getElementById('trx-id-input').value = '';
-      document.getElementById('deposit-modal').classList.remove('hidden');
-    }
-
-    function closeDepositModal() {
-      document.getElementById('deposit-modal').classList.add('hidden');
-    }
-
-    function copyAccountNo() {
-      const accNum = document.getElementById("accNumber").innerText;
-      navigator.clipboard.writeText(accNum).then(() => {
-        alert("Account number copied: " + accNum);
-      }).catch(() => {
-        alert("Failed to copy. Please copy manually: " + accNum);
-      });
-    }
-
-    async function handleDepositSubmit(e) {
-      e.preventDefault();
-      const trxId = document.getElementById('trx-id-input').value.trim();
-      const submitBtn = document.getElementById('deposit-submit-btn');
-
-      if (!trxId) {
-        alert("Please enter a valid Transaction ID.");
-        return;
-      }
-
-      submitBtn.innerText = "Submitting...";
-      submitBtn.disabled = true;
-
-      try {
-        const { data, error } = await _supabase
-          .from('user_investments')
-          .insert([{ 
-            user_name: currentUser.email, 
-            package_name: selectedPkg.name, 
-            amount_pkr: Number(selectedPkg.amount), 
-            daily_profit: Number(selectedPkg.dailyProfit),
-            trx_id: trxId,
-            status: 'Pending' 
-          }]);
-
-        if (error) {
-          alert("Error submitting request: " + error.message);
-        } else {
-          alert(`Success! Deposit request for ${selectedPkg.name} submitted.`);
-          closeDepositModal();
-          switchTab('investments');
-          loadUserData();
-        }
-      } catch (err) {
-        alert("Unexpected error: " + err.message);
-      } finally {
-        submitBtn.innerText = "Submit Deposit Request";
-        submitBtn.disabled = false;
-      }
-    }
+    async function logout() { await _supabase.auth.signOut(); checkUser(); }
   </script>
 </body>
 </html>
