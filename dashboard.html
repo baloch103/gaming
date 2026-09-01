@@ -22,8 +22,9 @@
   <main class="max-w-4xl mx-auto mt-12 px-4">
     <div class="bg-slate-800 border border-slate-700 rounded-xl p-8 shadow-xl flex flex-col md:flex-row justify-between items-center gap-6">
       <div>
-        <p class="text-xs text-slate-400 uppercase font-semibold">Total Approved Balance</p>
+        <p class="text-xs text-slate-400 uppercase font-semibold">Available Net Balance</p>
         <h3 id="user-balance" class="text-4xl font-extrabold text-emerald-400 mt-2">PKR 0</h3>
+        <p class="text-xs text-slate-500 mt-1" id="balance-details">Loading calculations...</p>
       </div>
       <div class="flex gap-4">
         <a href="index.html" class="bg-slate-700 hover:bg-slate-600 px-5 py-3 rounded-lg text-sm font-bold">➕ Deposit</a>
@@ -33,29 +34,66 @@
   </main>
 
   <script>
-    const _supabase = supabase.createClient('https://rrinvfjkvepclqesxaox.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyaW52ZmprdmVwY2xxZXN4YW94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNjg5MTMsImV4cCI6MjEwMzY0NDkxM30.5DRZBsF_k21AJE0SXf_p_gSSsR30FW0H-qm2aWQ4pb8');
+    const SUPABASE_URL = 'https://rrinvfjkvepclqesxaox.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyaW52ZmprdmVwY2xxZXN4YW94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNjg5MTMsImV4cCI6MjEwMzY0NDkxM30.5DRZBsF_k21AJE0SXf_p_gSSsR30FW0H-qm2aWQ4pb8';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     
     async function initDashboard() {
       const { data: { user } } = await _supabase.auth.getUser();
-      if (!user) { window.location.href = 'index.html'; return; }
+      if (!user) { 
+        window.location.href = 'index.html'; 
+        return; 
+      }
 
-      const { data } = await _supabase.from('user_investments').select('*').eq('user_name', user.email);
-      let balance = 0;
+      // 1. Fetch Approved Investments (ڪمايل رقم)
+      const { data: investments } = await _supabase
+        .from('user_investments')
+        .select('*')
+        .eq('user_name', user.email);
+
+      let totalEarned = 0;
       const now = new Date().getTime();
-      
-      if (data) {
-        data.forEach(item => {
+
+      if (investments) {
+        investments.forEach(item => {
           if (item.status === 'Approved') {
             const daysPassed = Math.floor((now - new Date(item.created_at).getTime()) / (1000 * 60 * 60 * 24));
-            balance += Number(item.daily_profit || 0) * Math.min(Math.max(daysPassed, 1), 60);
+            const activeDays = Math.min(Math.max(daysPassed, 1), 60);
+            totalEarned += Number(item.daily_profit || 0) * activeDays;
           }
         });
       }
-      document.getElementById('user-balance').innerText = `PKR ${balance.toLocaleString()}`;
+
+      // 2. Fetch Approved Withdrawals (ڪڍرايل رقم)
+      const { data: withdrawals } = await _supabase
+        .from('user_withdrawals')
+        .select('*')
+        .eq('user_name', user.email);
+
+      let totalWithdrawn = 0;
+
+      if (withdrawals) {
+        withdrawals.forEach(item => {
+          // صرف منظور (Approved) يا پروسيس ٿيل ويٿڊرا مائنس ٿيندو
+          if (item.status === 'Approved') {
+            totalWithdrawn += Number(item.amount_pkr || 0);
+          }
+        });
+      }
+
+      // 3. Final Calculation (باقي بئلينس = ڪل منافعو - ويٿڊرا)
+      const netBalance = totalEarned - totalWithdrawn;
+
+      document.getElementById('user-balance').innerText = `PKR ${netBalance.toLocaleString()}`;
+      document.getElementById('balance-details').innerText = `Total Earned: PKR ${totalEarned} | Total Withdrawn: PKR ${totalWithdrawn}`;
     }
+
     initDashboard();
 
-    async function logout() { await _supabase.auth.signOut(); window.location.href = 'index.html'; }
+    async function logout() { 
+      await _supabase.auth.signOut(); 
+      window.location.href = 'index.html'; 
+    }
   </script>
 </body>
 </html>
