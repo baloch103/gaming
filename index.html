@@ -76,12 +76,14 @@
       <h3 class="text-2xl font-bold text-emerald-400 mb-2">Deposit Payment</h3>
       <p id="selected-package-info" class="text-sm font-semibold text-slate-300 mb-4"></p>
 
-      <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 mb-4 text-left">
-        <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Payment Method: JazzCash</p>
-        <p class="text-xs text-slate-400 uppercase font-semibold mb-1">Account Title: Hasnain Communication</p>
-        <div class="flex items-center justify-between bg-slate-800 border border-slate-700 rounded-lg p-2 mt-2">
-          <span id="accNumber" class="font-mono text-emerald-400 font-bold">03363152236</span>
-          <button onclick="navigator.clipboard.writeText('03363152236'); alert('Copied!');" class="bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-md font-semibold">Copy</button>
+      <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 mb-4 text-left space-y-2">
+        <p class="text-xs text-slate-400 uppercase font-semibold">Easypaisa / JazzCash Account Details:</p>
+        <div class="text-sm">
+          <p class="text-slate-300">Account Name: <strong class="text-white">xvz</strong></p>
+          <div class="flex items-center justify-between bg-slate-800 border border-slate-700 rounded-lg p-2 mt-1">
+            <span class="font-mono text-emerald-400 font-bold">03000000000</span>
+            <button onclick="navigator.clipboard.writeText('03000000000'); alert('Copied!');" class="bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-md font-semibold hover:bg-emerald-600 transition">Copy</button>
+          </div>
         </div>
       </div>
 
@@ -89,6 +91,10 @@
         <div>
           <label class="block text-sm font-medium mb-1 text-slate-300">Transaction ID (Trx ID)</label>
           <input type="text" id="trx-id-input" required placeholder="e.g. 98234712093" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1 text-slate-300">Payment Screenshot / Receipt</label>
+          <input type="file" id="screenshot-input" accept="image/*" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-300 text-sm file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-emerald-500 file:text-white hover:file:bg-emerald-600">
         </div>
         <button type="submit" id="deposit-submit-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 py-2.5 rounded-lg font-semibold transition">Submit Deposit Request</button>
       </form>
@@ -121,63 +127,4 @@
 
   <script>
     const SUPABASE_URL = 'https://rrinvfjkvepclqesxaox.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyaW52ZmprdmVwY2xxZXN4YW94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNjg5MTMsImV4cCI6MjEwMzY0NDkxM30.5DRZBsF_k21AJE0SXf_p_gSSsR30FW0H-qm2aWQ4pb8';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    let currentMode = 'login';
-    let currentUser = null;
-    let selectedPkg = { name: '', amount: 0, dailyProfit: 0 };
-
-    async function checkUser() {
-      const { data: { user } } = await _supabase.auth.getUser();
-      if (user) {
-        currentUser = user;
-        document.getElementById('auth-buttons').classList.add('hidden');
-        document.getElementById('user-info').classList.remove('hidden');
-        document.getElementById('user-email').innerText = user.email;
-      } else {
-        currentUser = null;
-        document.getElementById('auth-buttons').classList.remove('hidden');
-        document.getElementById('user-info').classList.add('hidden');
-      }
-    }
-    checkUser();
-
-    function subscribePackage(pkgName, amount, dailyProfit) {
-      if (!currentUser) { openModal('login'); return; }
-      selectedPkg = { name: pkgName, amount, dailyProfit };
-      document.getElementById('selected-package-info').innerText = `Selected: ${pkgName} (PKR ${amount})`;
-      document.getElementById('deposit-modal').classList.remove('hidden');
-    }
-
-    function closeDepositModal() { document.getElementById('deposit-modal').classList.add('hidden'); }
-
-    async function handleDepositSubmit(e) {
-      e.preventDefault();
-      const trxId = document.getElementById('trx-id-input').value.trim();
-      const { error } = await _supabase.from('user_investments').insert([{ 
-        user_name: currentUser.email, package_name: selectedPkg.name, 
-        amount_pkr: Number(selectedPkg.amount), daily_profit: Number(selectedPkg.dailyProfit),
-        trx_id: trxId, status: 'Pending' 
-      }]);
-      if (!error) { alert("Deposit request submitted!"); window.location.href = "history.html"; }
-    }
-
-    function openModal(mode) { currentMode = mode; document.getElementById('auth-modal').classList.remove('hidden'); }
-    function closeModal() { document.getElementById('auth-modal').classList.add('hidden'); }
-    function toggleAuthMode() { currentMode = currentMode === 'login' ? 'register' : 'login'; }
-
-    async function handleAuth(e) {
-      e.preventDefault();
-      const email = document.getElementById('auth-email').value;
-      const password = document.getElementById('auth-password').value;
-      const fn = currentMode === 'register' ? _supabase.auth.signUp({ email, password }) : _supabase.auth.signInWithPassword({ email, password });
-      const { error } = await fn;
-      if (error) alert(error.message);
-      else { closeModal(); checkUser(); }
-    }
-
-    async function logout() { await _supabase.auth.signOut(); checkUser(); }
-  </script>
-</body>
-</html>
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyaW52ZmprdmVwY2xxZXN4YW94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNjg5MTMsImV4cCI6MjEwMzY0NDkxM30.5DRZBsF_k21AJE0SXf_p_gSSsR30FW0H-qm2
