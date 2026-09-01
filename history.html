@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>History - ProfitInvest PKR</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-900 text-white font-sans">
+
+  <header class="p-5 bg-slate-800 border-b border-slate-700 flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-emerald-400">ProfitInvest PKR</h1>
+    <div class="space-x-4">
+      <a href="dashboard.html" class="text-slate-300 hover:text-emerald-400 text-sm font-semibold">Dashboard</a>
+      <a href="index.html" class="text-slate-300 hover:text-emerald-400 text-sm font-semibold">Packages</a>
+      <a href="withdraw.html" class="text-slate-300 hover:text-emerald-400 text-sm font-semibold">Withdraw</a>
+      <button onclick="logout()" class="bg-rose-600 hover:bg-rose-500 px-3 py-1 rounded text-xs">Logout</button>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto mt-8 px-4 space-y-8">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-xl">
+      <h3 class="text-xl font-bold text-emerald-400 mb-4 border-b border-slate-700 pb-2">Investment History</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-900 text-slate-400 uppercase text-xs">
+            <tr><th class="p-3">Package</th><th class="p-3">Amount</th><th class="p-3">Daily Profit</th><th class="p-3">Trx ID</th><th class="p-3">Status</th></tr>
+          </thead>
+          <tbody id="investments-list"><tr><td colspan="5" class="p-4 text-center">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-xl">
+      <h3 class="text-xl font-bold text-emerald-400 mb-4 border-b border-slate-700 pb-2">Withdrawal History</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-900 text-slate-400 uppercase text-xs">
+            <tr><th class="p-3">Amount</th><th class="p-3">Method</th><th class="p-3">Title</th><th class="p-3">Number</th><th class="p-3">Status</th></tr>
+          </thead>
+          <tbody id="withdrawals-list"><tr><td colspan="5" class="p-4 text-center">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const _supabase = supabase.createClient('https://rrinvfjkvepclqesxaox.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyaW52ZmprdmVwY2xxZXN4YW94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNjg5MTMsImV4cCI6MjEwMzY0NDkxM30.5DRZBsF_k21AJE0SXf_p_gSSsR30FW0H-qm2aWQ4pb8');
+
+    async function loadHistory() {
+      const { data: { user } } = await _supabase.auth.getUser();
+      if (!user) { window.location.href = 'index.html'; return; }
+
+      // Fetch Investments
+      const { data: inv } = await _supabase.from('user_investments').select('*').eq('user_name', user.email);
+      const invContainer = document.getElementById('investments-list');
+      invContainer.innerHTML = inv && inv.length ? inv.map(i => `
+        <tr class="border-b border-slate-700/50">
+          <td class="p-3 text-emerald-400 font-semibold">${i.package_name}</td>
+          <td class="p-3">PKR ${i.amount_pkr}</td>
+          <td class="p-3 text-emerald-300">+PKR ${i.daily_profit}/day</td>
+          <td class="p-3 font-mono text-xs">${i.trx_id}</td>
+          <td class="p-3"><span class="px-2 py-1 rounded text-xs bg-slate-700">${i.status}</span></td>
+        </tr>`).join('') : '<tr><td colspan="5" class="p-4 text-center">No investments found.</td></tr>';
+
+      // Fetch Withdrawals
+      const { data: wth } = await _supabase.from('user_withdrawals').select('*').eq('user_name', user.email);
+      const wthContainer = document.getElementById('withdrawals-list');
+      wthContainer.innerHTML = wth && wth.length ? wth.map(w => `
+        <tr class="border-b border-slate-700/50">
+          <td class="p-3 font-bold text-emerald-400">PKR ${w.amount_pkr}</td>
+          <td class="p-3">${w.payment_method}</td>
+          <td class="p-3">${w.account_title}</td>
+          <td class="p-3 font-mono text-xs">${w.account_number}</td>
+          <td class="p-3"><span class="px-2 py-1 rounded text-xs bg-slate-700">${w.status}</span></td>
+        </tr>`).join('') : '<tr><td colspan="5" class="p-4 text-center">No withdrawals found.</td></tr>';
+    }
+    loadHistory();
+
+    async function logout() { await _supabase.auth.signOut(); window.location.href = 'index.html'; }
+  </script>
+</body>
+</html>
